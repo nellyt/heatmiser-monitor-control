@@ -9,6 +9,8 @@ http://www.heatmiser.co.uk
   * To read data from a set of controllers and present this info
   * Gather some historical data
 
+http://code.google.com/p/heatmiser-monitor-control/source/browse/wiki/heattime.png
+
 = Details =
 
 Add your content here.  Format your content with:
