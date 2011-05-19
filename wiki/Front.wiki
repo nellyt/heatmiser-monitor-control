@@ -2,8 +2,12 @@
 
 = Introduction =
 
-Add your content here.
+Some python scripts to interact with Heatmiser thermostats.
+http://www.heatmiser.co.uk
 
+==Aims==
+  * To read data from a set of controllers and present this info
+  * Gather some historical data
 
 = Details =
 
@@ -11,4 +15,16 @@ Add your content here.  Format your content with:
   * Text in *bold* or _italic_
   * Headings, paragraphs, and lists
   * Automatic links to other wiki pages
-* http://www.heatmiser.co.uk/support/admin/attachments/protocolv3system.pdf
+* 
+
+There seem to be two generations of controllers in the field using what is known as V2 and V3 protocols.
+V2 is simpler and has been reverse engineered.
+V3 is publicly available at http://www.heatmiser.co.uk/support/admin/attachments/protocolv3system.pdf
+
+This code currently supports only V3
+
+=Other projects/info online=
+
+==Limitations==
+  * Currently supports only V3, extension would be quite easy
+  * Display currently only compatible with 5/2 mode
