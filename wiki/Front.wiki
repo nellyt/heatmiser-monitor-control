@@ -28,5 +28,5 @@ This code currently supports only V3
 =Other projects/info online=
 
 ==Limitations==
-  * Currently supports only V3, extension would be quite easy
+  * Currently supports only V3, extension would be quite easy issue #1
   * Display currently only compatible with 5/2 mode
