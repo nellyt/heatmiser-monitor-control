@@ -1,6 +1,8 @@
 #
 # Neil Trimboy 2011
 #
+# Sets current time/date to all controllers
+#
 # Despite Heatmiser V3 protocol document stating that current day/h/m/s is on 4 separate addresses [43,46]
 # Tests showed that it was not possible to write to individual value anf that all 4 values must be written in a single command
 import serial
