@@ -23,6 +23,8 @@ http://heatmiser-monitor-control.googlecode.com/svn/wiki/heating_status.png
 http://heatmiser-monitor-control.googlecode.com/svn/wiki/heating_config.png
 http://heatmiser-monitor-control.googlecode.com/svn/wiki/heating_times.png
 http://heatmiser-monitor-control.googlecode.com/svn/wiki/heattime.png
+http://heatmiser-monitor-control.googlecode.com/svn/wiki/heating_times.png
+http://heatmiser-monitor-control.googlecode.com/svn/wiki/Study_7day.png
 
 = Details =
 
