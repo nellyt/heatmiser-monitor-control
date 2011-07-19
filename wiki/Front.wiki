@@ -57,6 +57,8 @@ I am connected using a USB to RS485 adapter
 =Coding=
 This was a learning exercise in python for me and so a lot of code was experimental.
 Functionality is more important than elegance to me at this point, given time I hope to tidy things.
+Some of the code is dire but has been posted here before I'd really like as it has been requested. I hope to tidy it up in the coming weeks.
+It has been running reliably for me for several months.
 
 =Where is this going=
 Client side display/processing of the data provided the quickest way to getting the functionality I wanted with a rapidly approaching winter.
