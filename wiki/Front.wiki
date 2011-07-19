@@ -5,8 +5,8 @@
 Some python scripts to interact with Heatmiser thermostats.
 http://www.heatmiser.co.uk
 
-==Aims==
-  * To read data from a set of controllers and present this info
+==Aims/Motivations==
+  * To read data from a set of controllers and present this info to see what my heating system was up to
   * Gather some historical data
 
 ==Current Features==
@@ -49,3 +49,13 @@ This code currently supports only V3
 =Hardware=
 Controllers use RS485.
 I am connected using a USB to RS485 adapter
+
+=Coding=
+This was a learning exercise in python for me and so a lot of code was experimental.
+Functionality is more important than elegance to me at this point, given time I hope to tidy things.
+
+=Where is this going=
+Client side display/processing of the data provided the quickest way to getting the functionality I wanted with a rapidly approaching winter.
+This is not ideal, I'm struggling to get the pages to display in all browsers, the result being I am also unable to view on my phone (Android)
+I intend to change to server side processing of the data for display of the web pages.
+I hope to then be able to add some basic click buttons to this to turn on/off zones.
