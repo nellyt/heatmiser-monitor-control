@@ -10,6 +10,10 @@ import os
 
 from stats_defn import StatList
 
+d = os.path.join(os.getcwd(),"graphs")
+if not os.path.exists(d):
+	os.makedirs(d)
+	
 problem = 0
 
 rrdfile = 'hmstats.rrd'
@@ -33,7 +37,7 @@ graphs = [
 for graph in graphs:
 	for controller in StatList:
 		start_time = graph[1]  
-		output_filename = controller[1] + '_' + graph[0] + '.png'
+		output_filename = 'graphs/' + controller[1] + '_' + graph[0] + '.png'
 		end_time = graph[2]
 		ds_name = 'Air'
 		ds_name2 = 'Floor'
@@ -82,7 +86,7 @@ for graph in graphs:
 			
 # Now the optimstart graph
 start_time = '-8week'  
-output_filename = 'optimstart.png'
+output_filename = 'graphs/' + 'optimstart.png'
 end_time = 'now'
 width = '400'
 height = '150'
@@ -112,7 +116,7 @@ if len(cmd_output) > 0:
 
 # Now the timeerr graph
 start_time = '-14day'  
-output_filename = 'timeerr.png'
+output_filename = 'graphs/' + 'timeerr.png'
 end_time = 'now'
 width = '400'
 height = '150'
@@ -160,7 +164,7 @@ if len(cmd_output) > 0:
 # @todo move to gengraphs.py
 for controller in StatList:
 	start_time = '-3day'  
-	output_filename = controller[1] + '.png'
+	output_filename = 'graphs/' + controller[1] + '.png'
 	end_time = 'now'
 	ds_name = 'Air'
 	ds_name2 = 'Floor'
