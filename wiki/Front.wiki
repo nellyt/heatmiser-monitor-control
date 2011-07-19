@@ -26,6 +26,10 @@ http://heatmiser-monitor-control.googlecode.com/svn/wiki/heattime.png
 http://heatmiser-monitor-control.googlecode.com/svn/wiki/heating_times.png
 http://heatmiser-monitor-control.googlecode.com/svn/wiki/Study_7days.png
 
+=Requirements=
+I am using Python 2.7
+You also need PySerial http://pyserial.sourceforge.net/
+
 = Details =
 
 Add your content here.  Format your content with:
