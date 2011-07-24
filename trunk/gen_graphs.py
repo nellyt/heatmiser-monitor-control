@@ -67,8 +67,9 @@ for graph in graphs:
 			' --start=' + start_time + \
 			' --end=' + end_time + \
 			' --width=1000' + \
-			' --height=300'
-					# ' GPRINT:' + ds_name  + 'last:"                         Current Air   = %6.2lf%S"' + \
+			' --height=300' + \
+			' --lower-limit="0"'
+			# ' GPRINT:' + ds_name  + 'last:"                         Current Air   = %6.2lf%S"' + \
 			# ' GPRINT:' + ds_name2 + 'last:"                         Current Floor = %6.2lf%S"' + \
 			# ' GPRINT:' + ds_name3 + 'last:"                         Current Set   = %6.2lf%S"' + \
 		#	' VDEF:' + ds_name + 'last=' + ds_name + ',LAST' + \
@@ -76,7 +77,7 @@ for graph in graphs:
 		#	' COMMENT:"' + cur_date + '"' + \
 		#	' GPRINT:' + ds_name + 'avg:"                         average=%6.2lf%S"' + \
 		# ' --title=Room "' + rrdfile +'"' + \
-		# ' --lower-limit="0"'
+			
 		print cmd_graph
 		cmd = os.popen4(cmd_graph)
 		cmd_output = cmd[1].read()
@@ -135,8 +136,8 @@ cmd_graph += ' COMMENT:"Generated ' + cur_date + '"' + \
 ' --end=' + end_time + \
 ' --width=1000' + \
 ' --height=300' + \
-' --upper-limit=300' + \
-' --lower-limit=-300' + \
+' --upper-limit=120' + \
+' --lower-limit=-120' + \
 ' --rigid'
 print cmd_graph
 cmd = os.popen4(cmd_graph)
