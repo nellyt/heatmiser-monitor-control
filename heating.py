@@ -6,15 +6,14 @@ import serial
 from struct import pack
 import time
 import sys
-# Import smtplib for the actual sending function
 import smtplib
-# Import the email modules we'll need
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email.mime.text import MIMEText
 from email import Encoders
 import os
 
+# Import our own stuff
 from stats_defn import StatList
 import email_settings
 
@@ -201,7 +200,6 @@ if (not os.path.exists(fname)):
 else:
 	startofday = 0
 
-#ferr = open('errorlog.txt', 'a')
 ferr = open(fname, 'a')
 # TODO Catch file not opened
 
@@ -543,24 +541,23 @@ for controller in StatList:
 # Cycle round controllers complete
 f.write('</poll>\n')
 # Print summary
-fc = open('heatmiser_status.csv', 'a')
+fcsv = open('heatmiser_status.csv', 'a')
 
 s= localtime + ','
-fc.write(s)
+fcsv.write(s)
 	
 for loop in range(1, 13):
 	# TODO cope with bad response here
 	if(badresponse[loop] == 0):
 		print "Sensor %2d Temp is %d and %d and %d" % (loop, intairtemp[loop], remoteairtemp[loop], floortemp[loop])
 		s=repr(loop) +',' + repr(intairtemp[loop])  + ',' + repr(remoteairtemp[loop]) + ',' +repr(floortemp[loop]) + ',' + repr(settemp[loop]) +',' + repr(demand[loop]) +','
-		fc.write(s)
+		fcsv.write(s)
 	else:
 		print "Sensor %2d is dead" % (loop)
 		s=repr(loop) +',' + '#N/A,' + '#N/A,' + '#N/A,' + '#N/A,' + '#N/A,'
-		fc.write(s)
-fc.write('x\n')
-fc.close()
-
+		fcsv.write(s)
+fcsv.write('x\n')
+fcsv.close()
 	
 f.close()
 
@@ -617,6 +614,8 @@ if len(cmd_output) > 0:
 	
 #END OF CYCLE THROUGH CONTROLLERS
 	
+# Now do some tidying up of loose ends
+# @todo still some files to close I think
 serport.close() # close port
 print "Port is now"
 print serport.isOpen()
