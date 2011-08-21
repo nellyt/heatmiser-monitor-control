@@ -2,6 +2,7 @@
 # Neil Trimboy 2011
 #
 
+
 # Protocol for each controller
 HMV2_ID = 2
 HMV3_ID = 3
