@@ -12,6 +12,7 @@ from email.MIMEBase import MIMEBase
 from email.mime.text import MIMEText
 from email import Encoders
 import os
+import shutil
 
 # Import our own stuff
 from stats_defn import StatList
@@ -192,16 +193,33 @@ polltimet = time.localtime(polltime)
 localtime = time.strftime("%d %b %Y %H:%M:%S +0000", polltimet)
 localday = time.strftime("%w", polltimet)
 
+d = os.path.join(os.getcwd(),"logs")
+if not os.path.exists(d):
+	os.makedirs(d)
+
 fname = time.strftime("errorlog_%Y%m%d.txt", polltimet)
-print fname
-if (not os.path.exists(fname)):
+ffullname = os.path.join(d,fname)
+if (not os.path.exists(ffullname)):
 	print "Looks like a new day"
 	startofday = 1
 else:
 	startofday = 0
 
-ferr = open(fname, 'a')
+ferr = open(ffullname, 'a')
 # TODO Catch file not opened
+
+dbup = os.path.join(os.getcwd(),"backup")
+if not os.path.exists(dbup):
+	os.makedirs(dbup)
+	
+if startofday == 1:
+	print "Backing up files"
+	buname = time.strftime("hmstats_%Y%m%d.rrd", polltimet)
+	bufullname = os.path.join(dbup,buname)
+	shutil.copy2(rrdfile,bufullname)
+	buname = time.strftime("hmoptimstart%Y%m%d.rrd", polltimet)
+	bufullname = os.path.join(dbup,buname)
+	shutil.copy2(rrdrocfile,bufullname)
 
 serport = serial.Serial()
 serport.port = 6 # 1 less than com port, USB is 6=com7, ether is 9=10
@@ -220,14 +238,8 @@ except serial.SerialException, e:
         mail(email_to_addr, "Heatmiser Polling Error ", "Could not open serial port", "errorlog.txt")
         sys.exit(1) # TODO this doesnt seem to exit
         
-print "COM port configuration is "
-print serport.name #Check which port was used
-print serport.baudrate
-print serport.bytesize
-print serport.parity
-print serport.stopbits
-print serport.timeout
-print serport.isOpen()
+print "%s port configuration is %s" % (serport.name, serport.isOpen())
+print "%s baud, %s bit, %s parity, with %s stopbits, timeout %s seconds" % (serport.baudrate, serport.bytesize, serport.parity, serport.stopbits, serport.timeout)
  
 # How initialise good and bad to zero?
 #good = 0
@@ -346,7 +358,7 @@ for controller in StatList:
 			
 			vendor = datal[2+ DATAOFFSET]
 			version = datal[3+ DATAOFFSET] & 0x7f
-			floorlimiting = datal[2+ DATAOFFSET] >> 8
+			floorlimiting = datal[3+ DATAOFFSET] >> 7
 			model = datal[4+ DATAOFFSET]
 			tempfmt = datal[5+ DATAOFFSET]
 			switchdiff = datal[6+ DATAOFFSET]
@@ -374,7 +386,7 @@ for controller in StatList:
 			tempholdminshigh = datal[26+ DATAOFFSET]
 			tempholdminslow = datal[27+ DATAOFFSET]
 			tempholdmins = (tempholdminshigh*256 + tempholdminslow)
-			remoteairtemphigh = datal[27+ DATAOFFSET]
+			remoteairtemphigh = datal[28+ DATAOFFSET]
 			remoteairtemplow  = datal[29+ DATAOFFSET]
 			remoteairtemp[loop] = (remoteairtemphigh*256 + remoteairtemplow)/10.0
 			floortemphigh = datal[30+ DATAOFFSET]
@@ -459,7 +471,7 @@ for controller in StatList:
 		print "Time %d %d" % (remoteseconds, nowseconds)
 		timeerr[loop] = nowseconds - remoteseconds
 		if (abs(timeerr[loop]) > TIME_ERR_LIMIT):
-			s= "%s : Controller %2d : Time Error : Greater than %d local is %s, sensor is %s\n" % (localtime, loop, TIME_ERR_LIMIT, nowseconds, remoteseconds)
+			s= "%s %s : Controller %2d : Time Error : Greater than %d local is %s, sensor is %s\n" % (startofday, localtime, loop, TIME_ERR_LIMIT, nowseconds, remoteseconds)
 			ferr.write(s)
 			unhealthy[loop] += 1
 			# TODO ++ here
@@ -541,7 +553,16 @@ for controller in StatList:
 # Cycle round controllers complete
 f.write('</poll>\n')
 # Print summary
-fcsv = open('heatmiser_status.csv', 'a')
+fcsvfile = 'heatmiser_status.csv'
+fcsv = open(fcsvfile, 'a')
+if startofday == 1:
+	print "Backing up files"
+	buname = time.strftime("heatmiser_status%Y%m%d.csv", polltimet)
+	bufullname = os.path.join(dbup,buname)
+	print buname
+	print bufullname
+	print fcsvfile
+	shutil.copy2(fcsvfile,bufullname)
 
 s= localtime + ','
 fcsv.write(s)
@@ -624,4 +645,4 @@ ferr.close()
 
 if (problem > 0):
 	print "Emailing error reprt"
-	mail(email_settings.email_to_addr, "Heatmiser Polling Error ", "A Problem has occurred", fname)
+	mail(email_settings.email_to_addr, "Heatmiser Polling Error ", "A Problem has occurred", ffullname)
