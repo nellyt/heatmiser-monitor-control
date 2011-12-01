@@ -32,6 +32,7 @@ graphs = [
 ["4Weeks", '-4week', 'now'],
 ["8Weeks", '-8week', 'now'],
 ["12Weeks", '-12week', 'now'],
+["52Weeks", '-52week', 'now'],
 ]
 
 for graph in graphs:
@@ -86,7 +87,7 @@ for graph in graphs:
 			print cmd_output
 			
 # Now the optimstart graph
-start_time = '-8week'  
+start_time = '-12week'  
 output_filename = 'graphs/' + 'optimstart.png'
 end_time = 'now'
 width = '400'
@@ -116,7 +117,7 @@ if len(cmd_output) > 0:
 	print cmd_output
 
 # Now the timeerr graph
-start_time = '-14day'  
+start_time = '-8week'  
 output_filename = 'graphs/' + 'timeerr.png'
 end_time = 'now'
 width = '400'
