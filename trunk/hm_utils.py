@@ -67,6 +67,7 @@ class crc16:
         #print "CRC is Low %d High  %d" % (self.low, self.high)
         return [self.low, self.high]
 
+# TODO is this next comment a dead comment?
 # Always read whole DCB
 def hmFormMsg(destination, protocol, source, function, start, payload) :
   """Forms a message payload, excluding CRC"""
