@@ -4,7 +4,11 @@
 
 from hm_constants import *
 
+
+
 # A list of controllers
+# Adjust the number of rows in this list as required
+# Items in each row are :
 # Controller Address, ShortName, LongName, Controller Type, Graph Colour
 StatList = [
 [1,  "Study", "Study",    HMV3_ID, "A020F0"],
@@ -20,3 +24,10 @@ StatList = [
 [11, "Bed_2", "Bedroom2", HMV3_ID, "1E90FF"],
 [12, "Bed_3", "Bedroom3", HMV3_ID, "6A5ACD"],
 ]
+
+# Named indexing into StatList
+SL_ADDR = 0
+SL_SHRT_NAME = 1
+SL_LONH_NAME = 2
+SL_CONTR_TYPE = 3
+SL_GRAPH_COL = 4

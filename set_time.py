@@ -29,18 +29,18 @@ sys.stderr = open('errorlog.txt', 'a') # Redirect stderr
 # Generate a RFC2822 format date
 # This works with both Excel and Timeline
 localtime = time.asctime( time.localtime(time.time()))
-polltime = time.time()
+polltime  = time.time()
 polltimet = time.localtime(polltime)
 localtime = time.strftime("%d %b %Y %H:%M:%S +0000", polltimet)
-localday = time.strftime("%w", polltimet)
+localday  = time.strftime("%w", polltimet)
 
 serport = serial.Serial()
-serport.port = 6 # 1 less than coim port, USB is 6=com7, ether is 9=10
+serport.port     = 6 # 1 less than coim port, USB is 6=com7, ether is 9=10
 serport.baudrate = 4800
 serport.bytesize = serial.EIGHTBITS
-serport.parity = serial.PARITY_NONE
+serport.parity   = serial.PARITY_NONE
 serport.stopbits = serial.STOPBITS_ONE
-serport.timeout = 3
+serport.timeout  = 3
 try:
     serport.open()
 except serial.SerialException, e:
@@ -52,7 +52,6 @@ except serial.SerialException, e:
 
 print "%s port configuration is %s" % (serport.name, serport.isOpen())
 print "%s baud, %s bit, %s parity, with %s stopbits, timeout %s seconds" % (serport.baudrate, serport.bytesize, serport.parity, serport.stopbits, serport.timeout)
-
 
 #good = [0,0,0,0,0,0,0,0,0,0,0,0,0] # TODO one bigger than size required YUK
 #bad =  [0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -79,7 +78,7 @@ for controller in StatList:
 		secs = 60 # Need to do this as pyhton seconds can be  [0,61]
 	print "%d %d:%d:%d" % (day, hour, mins, secs)
 	payload = [day, hour, mins, secs]
-	msg = hmFormMsgCRC(destination, controller[3], MASTER_ADDR, FUNC_WRITE, CUR_TIME_ADDR, payload)
+	msg = hmFormMsgCRC(destination, controller[SL_CONTR_TYPE], MASTER_ADDR, FUNC_WRITE, CUR_TIME_ADDR, payload)
 	print msg
 	# http://stackoverflow.com/questions/180606/how-do-i-convert-a-list-of-ascii-values-to-a-string-in-python
 	string = ''.join(map(chr,msg))
@@ -121,4 +120,3 @@ print "Port is now %s" % serport.isOpen()
 
 #if (problem > 0):
 	#mail(you, "Heatmiser TimeSet Error ", "A Problem has occurred", "errorlog.txt")
-
