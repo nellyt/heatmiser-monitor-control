@@ -153,7 +153,7 @@ else:
 
 #ferr = open(ffullname, 'a')
 # TODO Catch file not opened
-sys.stderr = open(ffullname, 'a')  # Redirect stderr
+#sys.stderr = open(ffullname, 'a')  # Redirect stderr
 
 dbup = os.path.join(os.getcwd(),"backup")
 if not os.path.exists(dbup):
@@ -248,8 +248,8 @@ for controller in StatList:
 	destination = loop
 	start_low = 0
 	start_high = 0
-	read_length_high = RW_LENGTH_ALL_HIGH
-	read_length_low = RW_LENGTH_ALL_LOW
+	read_length_high = (RW_LENGTH_ALL & 0xff)
+	read_length_low = (RW_LENGTH_ALL >> 8) & 0xff
 	data = [destination, 0x0a, MASTER_ADDR, FUNC_READ, start_low, start_high, read_length_low, read_length_high]
 	#print data
 	# http://stackoverflow.com/questions/180606/how-do-i-convert-a-list-of-ascii-values-to-a-string-in-python
@@ -294,7 +294,7 @@ for controller in StatList:
 	datal = datal + (map(ord,byteread))
 
 		
-	if (hmVerifyMsgCRCOK(MASTER_ADDR, controller[3], destination, FUNC_READ, 75, datal) == False):
+	if (hmVerifyMsgCRCOK(MASTER_ADDR, controller[SL_CONTR_TYPE], destination, FUNC_READ, 75, datal) == False):
 		badresponse[loop] += 1
 	
 	if (badresponse[loop]== 0):
