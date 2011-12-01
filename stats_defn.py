@@ -2,10 +2,7 @@
 # Neil Trimboy 2011
 #
 
-
-# Protocol for each controller
-HMV2_ID = 2
-HMV3_ID = 3
+from hm_constants import *
 
 # A list of controllers
 # Controller Address, ShortName, LongName, Controller Type, Graph Colour

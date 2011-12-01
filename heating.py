@@ -15,7 +15,9 @@ import os
 import shutil
 
 # Import our own stuff
-from stats_defn import StatList
+from stats_defn import *
+from hm_constants import *
+from hm_utils import *
 import email_settings
 
 # Source
@@ -50,68 +52,12 @@ def mail(to, subject, text, attach=None):
    # Should be mailServer.quit(), but that crashes...
    mailServer.close()
    
-# Believe this is known as CCITT (0xFFFF)
-# This is the CRC function converted directly from the Heatmiser C code 
-# provided in their API
-# @todo Put in a util class
-class crc16:
-    LookupHigh = [
-    0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70,
-    0x81, 0x91, 0xa1, 0xb1, 0xc1, 0xd1, 0xe1, 0xf1
-    ]
-    LookupLow = [
-    0x00, 0x21, 0x42, 0x63, 0x84, 0xa5, 0xc6, 0xe7,
-    0x08, 0x29, 0x4a, 0x6b, 0x8c, 0xad, 0xce, 0xef
-    ]
-    def __init__(self):
-        self.high = 0xff
-        self.low = 0xff
-    
-    def Update4Bits(self, val):
-        # Step one, extract the Most significant 4 bits of the CRC register
-        #print "val is %d" % (val)
-        t = self.high>>4
-        #print "t is %d" % (t)
-        
-        # XOR in the Message Data into the extracted bits
-        t = t^val
-        #print "t is %d" % (t)
-        
-        # Shift the CRC Register left 4 bits
-        self.high = (self.high << 4)|(self.low>>4)
-        self.high = self.high & 0xff    # force char
-        self.low = self.low <<4
-        self.low = self.low & 0xff  # force char
-        
-        # Do the table lookups and XOR the result into the CRC tables
-        #print "t for lookup is %d" % (t)
-        self.high = self.high ^ self.LookupHigh[t]
-        self.high = self.high & 0xff    # force char
-        self.low  = self.low  ^ self.LookupLow[t]
-        self.low = self.low & 0xff  # force char
-        #print "high is %d Low is %d" % (self.high, self.low)
-
-    def CRC16_Update(self, val):
-        self.Update4Bits(val>>4) # High nibble first
-        self.Update4Bits(val & 0x0f) # Low nibble
-
-    def run(self, message):
-        for c in message:
-            #print c
-            self.CRC16_Update(c)
-        #print "CRC is Low %d High  %d" % (self.low, self.high)
-        return [self.low, self.high]
-
  
 # CODE STARTS HERE
 
 DATAOFFSET = 9 # ToDO Move this higher up and and define what it is
 
 # Define magic numbers used in messages
-FUNC_READ  = 0
-FUNC_WRITE = 1
-RW_LENGTH_ALL_HIGH = 0xff
-RW_LENGTH_ALL_LOW  = 0xff
 MASTER_ADDR = 0x81
 
 # Acceptable error in time (s)
@@ -205,12 +151,15 @@ if (not os.path.exists(ffullname)):
 else:
 	startofday = 0
 
-ferr = open(ffullname, 'a')
+#ferr = open(ffullname, 'a')
 # TODO Catch file not opened
+sys.stderr = open(ffullname, 'a')  # Redirect stderr
 
 dbup = os.path.join(os.getcwd(),"backup")
 if not os.path.exists(dbup):
 	os.makedirs(dbup)
+
+fcsvfile = 'heatmiser_status.csv'
 	
 if startofday == 1:
 	print "Backing up files"
@@ -220,6 +169,14 @@ if startofday == 1:
 	buname = time.strftime("hmoptimstart%Y%m%d.rrd", polltimet)
 	bufullname = os.path.join(dbup,buname)
 	shutil.copy2(rrdrocfile,bufullname)
+
+	print "Backing up files"
+	buname = time.strftime("heatmiser_status%Y%m%d.csv", polltimet)
+	bufullname = os.path.join(dbup,buname)
+	print buname
+	print bufullname
+	print fcsvfile
+	shutil.copy2(fcsvfile,bufullname)
 
 serport = serial.Serial()
 serport.port = 6 # 1 less than com port, USB is 6=com7, ether is 9=10
@@ -233,7 +190,7 @@ try:
 except serial.SerialException, e:
         sys.stderr.write("Could not open serial port %s: %s\n" % (serport.portstr, e))
         s= "%s : Could not open serial port %s: %s\n" % (localtime, serport.portstr, e)
-        ferr.write(s)
+        sys.stderr.write(s)
         problem += 1
         mail(email_to_addr, "Heatmiser Polling Error ", "Could not open serial port", "errorlog.txt")
         sys.exit(1) # TODO this doesnt seem to exit
@@ -278,7 +235,7 @@ f.write("<seconds>" + time.strftime("%S", polltimet) + "</seconds>\n")
 f.write("<unixtime>" + str(polltime) + "</unixtime>\n")
 f.write("<readable>" + localtime + "</readable>\n")
 f.write("</polltime>\n")
-# This should be a foreach stat
+# CYCLE THROUGH ALL CONTROLLERS
 for controller in StatList:
 	loop = controller[0]
 	print loop
@@ -298,6 +255,9 @@ for controller in StatList:
 	# http://stackoverflow.com/questions/180606/how-do-i-convert-a-list-of-ascii-values-to-a-string-in-python
 	crc = crc16()
 	data = data + crc.run(data)
+	print data
+	#msg = hmFormMsgCRC(destination, controller[3], MASTER_ADDR, FUNC_READ, CUR_TIME_ADDR, payload)
+	#print msg
 	string = ''.join(map(chr,data))
 
 	#Now try converting it back
@@ -311,12 +271,13 @@ for controller in StatList:
 	except serial.SerialTimeoutException, e:
 		sys.stderr.write("Write timeout error: %s\n" % (e))
 		s= "%s : Write timeout error: %s\n" % (localtime, e)
-		ferr.write(s)
+		sys.stderr.write(s)
 		badresponse[loop] += 1
 
 	# Now wait for reply
 	byteread = serport.read(100)	# NB max return is 75 in 5/2 mode or 159 in 7day mode, this does not yet supt 7 day
 	#print "Bytes read %d" % (len(byteread) )
+	#TODO checking for length here can be removed
 	if (len(byteread)) == 75:
 		print  "Correct length reply received"
 		good[loop] = good[loop] + 1
@@ -324,31 +285,17 @@ for controller in StatList:
 		print "Incorrect length reply %s" % (len(byteread))
 		bad[loop] = bad[loop] + 1
 		s= "%s : Controller %2d : Incorrect length reply : %s\n" % (localtime, loop, len(byteread))
-		ferr.write(s) 
+		sys.stderr.write(s) 
 		badresponse[loop] += 1		
 	
     # TODO All this should only happen if correct length reply
     #Now try converting it back to array
 	datal = []
 	datal = datal + (map(ord,byteread))
-	# print datal
-	# Now check the CRC
-	checksum = datal[len(datal)-2:]
-	rxmsg = datal[:len(datal)-2]
-	# print checksum
-	# print rxmsg
-	crc = crc16() # Initialises the CRC
-	expectedchecksum = crc.run(rxmsg)
-	if expectedchecksum == checksum:
-		print "CRC is correct"
-	else:
-		print "CRC is INCORRECT"
-		s= "%s : Controller %2d : Incorrect CRC: %s %s \n" % (localtime, loop, datal, expectedchecksum)
-		ferr.write(s)
-		badresponse[loop] += 1
+
 		
-	# TODO Check header of response here
-	
+	if (hmVerifyMsgCRCOK(MASTER_ADDR, controller[3], destination, FUNC_READ, 75, datal) == False):
+		badresponse[loop] += 1
 	
 	if (badresponse[loop]== 0):
 		# Should really only be length 75 or TBD at this point as we shouldnt do this if bad resp
@@ -458,7 +405,7 @@ for controller in StatList:
 		# localday (pyhton) is numbered 0-6 for Sun-Sat
 		if (int(localday) != int((currentday%7))):
 			s= "%s : Controller %2d : Incorrect day : local is %s, sensor is %s\n" % (localtime, loop, localday, currentday)
-			ferr.write(s)
+			sys.stderr.write(s)
 			unhealthy[loop] += 1
 			# TODO ++ here
 		remoteseconds = (((currenthour * 60) + currentmin) * 60) + currentsec
@@ -472,7 +419,7 @@ for controller in StatList:
 		timeerr[loop] = nowseconds - remoteseconds
 		if (abs(timeerr[loop]) > TIME_ERR_LIMIT):
 			s= "%s %s : Controller %2d : Time Error : Greater than %d local is %s, sensor is %s\n" % (startofday, localtime, loop, TIME_ERR_LIMIT, nowseconds, remoteseconds)
-			ferr.write(s)
+			sys.stderr.write(s)
 			unhealthy[loop] += 1
 			# TODO ++ here
 		
@@ -553,20 +500,14 @@ for controller in StatList:
 # Cycle round controllers complete
 f.write('</poll>\n')
 # Print summary
-fcsvfile = 'heatmiser_status.csv'
+
 fcsv = open(fcsvfile, 'a')
-if startofday == 1:
-	print "Backing up files"
-	buname = time.strftime("heatmiser_status%Y%m%d.csv", polltimet)
-	bufullname = os.path.join(dbup,buname)
-	print buname
-	print bufullname
-	print fcsvfile
-	shutil.copy2(fcsvfile,bufullname)
+
 
 s= localtime + ','
 fcsv.write(s)
-	
+
+# TODO where is magic numer 13 from!	
 for loop in range(1, 13):
 	# TODO cope with bad response here
 	if(badresponse[loop] == 0):
@@ -638,9 +579,8 @@ if len(cmd_output) > 0:
 # Now do some tidying up of loose ends
 # @todo still some files to close I think
 serport.close() # close port
-print "Port is now"
-print serport.isOpen()
-ferr.close()
+print "Port is now %s" % serport.isOpen()
+#ferr.close()
 #
 
 if (problem > 0):
