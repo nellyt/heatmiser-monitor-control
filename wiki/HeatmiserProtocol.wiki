@@ -1,0 +1,14 @@
+#summary One-sentence summary of this page.
+
+= Heatmiser V3 System Protocol¶=
+
+PRT-EN and PRT_ENTS controllers use the V3 protocol.
+
+
+== Documentation Errors ==
+
+There are a few errors and ambiguities in Heatmiser's documentation, mainly in the details of the "DCB structure" that provides the thermostat's configuration and status. The correct details were determined by reverse engineering responses from PRT-EN and PRT-ENTS therostates and trial and error. Some differences are unresolved. There appear to be more differences wit the PRT-*ENTS* controller
+
+  * PRT_ENTS only : Frost mode (addr 7) is reported differently to spec. Currently unresolved
+  * PRT-ENTS only : Key Lock (addr 22) is reported as per spec but cannot be set as expected. Writing 01 or 00 to this address does not turn the lock on or off
+  * Automatic links to other wiki pages
