@@ -1,6 +1,6 @@
 #summary One-sentence summary of this page.
 
-= Heatmiser V3 System Protocol¶=
+= Heatmiser V3 System Protocol=
 
 PRT-EN and PRT_ENTS controllers use the V3 protocol.
 
@@ -10,5 +10,6 @@ PRT-EN and PRT_ENTS controllers use the V3 protocol.
 There are a few errors and ambiguities in Heatmiser's documentation, mainly in the details of the "DCB structure" that provides the thermostat's configuration and status. The correct details were determined by reverse engineering responses from PRT-EN and PRT-ENTS therostates and trial and error. Some differences are unresolved. There appear to be more differences wit the PRT-*ENTS* controller
 
   * PRT_ENTS only : Frost mode (addr 7) is reported differently to spec. Currently unresolved
-  * PRT-ENTS only : Key Lock (addr 22) is reported as per spec but cannot be set as expected. Writing 01 or 00 to this address does not turn the lock on or off
-  * Automatic links to other wiki pages
+  * Model (addr 4) : It is not possible to identify a touch screen controller from a non touch-screen controller
+  * Current Time (addr 43,44,45,46) Despite the protocol stating that the current day/h/m/s are on 4 separate addresses, tests showed that it was not possible to write to individual values and all 4 values must be written in a single command to addr 43
+  * Holiday Hours (addr 24, 25) Despite the protocol stating that the holiday hours are on 2 separate addresses, tests showed that it was not possible to write to individual values and all 2 values must be written in a single command to addr 24
