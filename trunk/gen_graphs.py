@@ -87,7 +87,7 @@ for graph in graphs:
 			print cmd_output
 			
 # Now the optimstart graph
-start_time = '-12week'  
+start_time = '-52week'  
 output_filename = 'graphs/' + 'optimstart.png'
 end_time = 'now'
 width = '400'

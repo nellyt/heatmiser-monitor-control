@@ -4,7 +4,8 @@
 
 from hm_constants import *
 
-
+# Master Address
+MY_MASTER_ADDR = 0x81
 
 # A list of controllers
 # Adjust the number of rows in this list as required

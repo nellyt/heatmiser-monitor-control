@@ -8,6 +8,7 @@ import time
 import sys
 import os
 import shutil
+from datetime import datetime
 
 # Import our own stuff
 from stats_defn import *
@@ -69,6 +70,7 @@ class crc16:
 
 # TODO is this next comment a dead comment?
 # Always read whole DCB
+# TODO check master address is in legal range
 def hmFormMsg(destination, protocol, source, function, start, payload) :
   """Forms a message payload, excluding CRC"""
   if protocol == HMV3_ID:
@@ -191,3 +193,95 @@ def hmVerifyMsgCRCOK(destination, protocol, source, expectedFunction, expectedLe
     
   else:
     assert 0, "Un-supported protocol found %s" % protocol
+
+def hmKeyLock_On(destination, serport) :
+  hmKeyLock(destination, KEY_LOCK_LOCK, serport)
+
+def hmKeyLock_Off(destination, serport) :
+  hmKeyLock(destination, KEY_LOCK_UNLOCK, serport)
+
+def hmKeyLock(destination, state, serport) :
+    """bla bla"""
+    protocol = HMV3_ID # TODO should not be necessary to pass in protocol
+    if protocol == HMV3_ID:
+        payload = [state]
+        # TODO should not be necessary to pass in protocol as we can look that up in statlist
+        msg = hmFormMsgCRC(destination, protocol, MY_MASTER_ADDR, FUNC_WRITE, KEY_LOCK_ADDR, payload)
+    else:
+        "Un-supported protocol found %s" % protocol
+        assert 0, "Un-supported protocol found %s" % protocol
+        # TODO return error/exception
+        
+    print msg
+    string = ''.join(map(chr,msg))
+    
+    #TODO Need a send msg method
+    
+    print serport
+    
+    try:
+        written = serport.write(string)  # Write a string
+    except serial.SerialTimeoutException, e:
+        s= "%s : Write timeout error: %s\n" % (localtime, e)
+        sys.stderr.write(s)
+    # Now wait for reply
+    byteread = serport.read(100)	# NB max return is 75 in 5/2 mode or 159 in 7day mode
+    datal = []
+    datal = datal + (map(ord,byteread))
+
+    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, 2, datal) == False):
+        # badresponse[loop] += 1
+        print "OH DEAR BAD RESPONSE"
+    return 1
+    
+    
+def hmSetHolEnd(destination, enddatetime, serport) :
+    """bla bla"""
+    nowdatetime = datetime.now()
+    print nowdatetime
+    if enddatetime < nowdatetime:
+        print "oh dear" # TODO
+    duration = enddatetime - nowdatetime
+    days = duration.days
+    seconds = duration.seconds 
+    hours = seconds/(60*60)
+    totalhours = days*24 + hours + 1
+    print "Setting holiday to end in %d days %d hours or %d total_hours on %s, it is now %s" % (days, hours, totalhours, enddatetime, nowdatetime)
+    hmSetHolHours(destination, totalhours, serport)
+
+
+def hmSetHolHours(destination, hours, serport) :
+    """bla bla"""
+    protocol = HMV3_ID # TODO should not be necessary to pass in protocol
+    if protocol == HMV3_ID:
+        hours_lo = (hours & 0xff)
+        hours_hi = (hours >> 8) & 0xff
+        payload = [hours_lo, hours_hi]
+        # TODO should not be necessary to pass in protocol as we can look that up in statlist
+        msg = hmFormMsgCRC(destination, protocol, MY_MASTER_ADDR, FUNC_WRITE, HOL_HOURS_LO_ADDR, payload)
+    else:
+        "Un-supported protocol found %s" % protocol
+        assert 0, "Un-supported protocol found %s" % protocol
+        # TODO return error/exception
+        
+    print msg
+    string = ''.join(map(chr,msg))
+    
+    #TODO Need a send msg method
+    
+    print serport
+    
+    try:
+        written = serport.write(string)  # Write a string
+    except serial.SerialTimeoutException, e:
+        s= "%s : Write timeout error: %s\n" % (localtime, e)
+        sys.stderr.write(s)
+    # Now wait for reply
+    byteread = serport.read(100)	# NB max return is 75 in 5/2 mode or 159 in 7day mode
+    datal = []
+    datal = datal + (map(ord,byteread))
+
+    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, 2, datal) == False):
+        # badresponse[loop] += 1
+        print "OH DEAR BAD RESPONSE"
+    return 1
