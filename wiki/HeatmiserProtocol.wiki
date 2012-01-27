@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Problems and Issues with the Heatmiser V3 protocol as specified.
 
 = Heatmiser V3 System Protocol=
 
@@ -7,7 +7,7 @@ PRT-EN and PRT_ENTS controllers use the V3 protocol.
 
 == Documentation Errors ==
 
-There are a few errors and ambiguities in Heatmiser's documentation, mainly in the details of the "DCB structure" that provides the thermostat's configuration and status. The correct details were determined by reverse engineering responses from PRT-EN and PRT-ENTS therostates and trial and error. Some differences are unresolved. There appear to be more differences wit the PRT-*ENTS* controller
+There are a few errors and ambiguities in Heatmiser's documentation, mainly in the details of the "DCB structure" that provides the thermostat's configuration and status. The correct details were determined by reverse engineering responses from PRT-EN and PRT-ENTS thermostats and trial and error. Some differences are unresolved. There appear to be more differences with the PRT-*ENTS* controller
 
   * PRT_ENTS only : Frost mode (addr 7) is reported differently to spec. Currently unresolved
   * Model (addr 4) : It is not possible to identify a touch screen controller from a non touch-screen controller
