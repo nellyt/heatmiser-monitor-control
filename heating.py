@@ -52,13 +52,14 @@ def mail(to, subject, text, attach=None):
    # Should be mailServer.quit(), but that crashes...
    mailServer.close()
    
+   
+
  
 # CODE STARTS HERE
 
 DATAOFFSET = 9 # ToDO Move this higher up and and define what it is
 
 # Define magic numbers used in messages
-MASTER_ADDR = 0x81
 
 # Acceptable error in time (s)
 TIME_ERR_LIMIT = 60
@@ -160,6 +161,8 @@ if not os.path.exists(dbup):
 	os.makedirs(dbup)
 
 fcsvfile = 'heatmiser_status.csv'
+
+statusfile = 'heatmiser_status.xml'
 	
 if startofday == 1:
 	print "Backing up files"
@@ -177,6 +180,14 @@ if startofday == 1:
 	print bufullname
 	print fcsvfile
 	shutil.copy2(fcsvfile,bufullname)
+    
+	print "Backing up files"
+	buname = time.strftime("heatmiser_status%Y%m%d.xml", polltimet)
+	bufullname = os.path.join(dbup,buname)
+	print buname
+	print bufullname
+	print statusfile
+	shutil.copy2(statusfile,bufullname)
 
 serport = serial.Serial()
 serport.port = 6 # 1 less than com port, USB is 6=com7, ether is 9=10
@@ -217,7 +228,7 @@ rateofchange = range(12+1)
 timeerr = range(12+1)
 
 # CYCLE THROUGH 12 CONTROLLERS
-f = open('heatmiser_status.xml', 'w')
+f = open(statusfile, 'w')
 
 
 f.write('<?xml version="1.0" encoding="ISO-8859-1"?>\n')
@@ -250,13 +261,13 @@ for controller in StatList:
 	start_high = 0
 	read_length_high = (RW_LENGTH_ALL & 0xff)
 	read_length_low = (RW_LENGTH_ALL >> 8) & 0xff
-	data = [destination, 0x0a, MASTER_ADDR, FUNC_READ, start_low, start_high, read_length_low, read_length_high]
+	data = [destination, 0x0a, MY_MASTER_ADDR, FUNC_READ, start_low, start_high, read_length_low, read_length_high]
 	#print data
 	# http://stackoverflow.com/questions/180606/how-do-i-convert-a-list-of-ascii-values-to-a-string-in-python
 	crc = crc16()
 	data = data + crc.run(data)
 	print data
-	#msg = hmFormMsgCRC(destination, controller[3], MASTER_ADDR, FUNC_READ, CUR_TIME_ADDR, payload)
+	#msg = hmFormMsgCRC(destination, controller[3], MY_MASTER_ADDR, FUNC_READ, CUR_TIME_ADDR, payload)
 	#print msg
 	string = ''.join(map(chr,data))
 
@@ -294,7 +305,7 @@ for controller in StatList:
 	datal = datal + (map(ord,byteread))
 
 		
-	if (hmVerifyMsgCRCOK(MASTER_ADDR, controller[SL_CONTR_TYPE], destination, FUNC_READ, 75, datal) == False):
+	if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, controller[SL_CONTR_TYPE], destination, FUNC_READ, 75, datal) == False):
 		badresponse[loop] += 1
 	
 	if (badresponse[loop]== 0):
