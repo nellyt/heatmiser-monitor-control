@@ -6,11 +6,6 @@ import serial
 from struct import pack
 import time
 import sys
-import smtplib
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
-from email.mime.text import MIMEText
-from email import Encoders
 import os
 import shutil
 
@@ -18,39 +13,8 @@ import shutil
 from stats_defn import *
 from hm_constants import *
 from hm_utils import *
-import email_settings
+from mail_utils import *
 
-# Source
-# http://kutuma.blogspot.com/2007/08/sending-emails-via-gmail-with-python.html
-# plus mod for optional attachement from same blog entry
-def mail(to, subject, text, attach=None):
-   msg = MIMEMultipart()
-
-   msg['From'] = email_settings.email_from_addr
-   msg['To'] = to
-   msg['Subject'] = subject
-
-   msg.attach(MIMEText(text))
-  
-   if attach:
-       fp = open(attach, 'r')
-       msg.attach(MIMEText(fp.read()))# Put the attachment in line also
-       fp.close()
-
-       part = MIMEBase('application', 'octet-stream')
-       part.set_payload(open(attach, 'rb').read())
-       Encoders.encode_base64(part)
-       part.add_header('Content-Disposition',
-               'attachment; filename="%s"' % os.path.basename(attach))
-       msg.attach(part)
-   mailServer = smtplib.SMTP("smtp.gmail.com", 587)
-   mailServer.ehlo()
-   mailServer.starttls()
-   mailServer.ehlo()
-   mailServer.login(email_settings.email_from_addr, email_settings.gmail_pwd)
-   mailServer.sendmail(email_settings.email_from_addr, to, msg.as_string())
-   # Should be mailServer.quit(), but that crashes...
-   mailServer.close()
    
    
 
@@ -203,7 +167,7 @@ except serial.SerialException, e:
         s= "%s : Could not open serial port %s: %s\n" % (localtime, serport.portstr, e)
         sys.stderr.write(s)
         problem += 1
-        mail(email_to_addr, "Heatmiser Polling Error ", "Could not open serial port", "errorlog.txt")
+        mail(email_settings.email_to_addr, "Heatmiser Polling Error ", "Could not open serial port", "errorlog.txt")
         sys.exit(1) # TODO this doesnt seem to exit
         
 print "%s port configuration is %s" % (serport.name, serport.isOpen())
