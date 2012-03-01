@@ -108,9 +108,17 @@ d = os.path.join(os.getcwd(),"logs")
 if not os.path.exists(d):
 	os.makedirs(d)
 
+dbup = os.path.join(os.getcwd(),"backup")
+if not os.path.exists(dbup):
+	os.makedirs(dbup)
+    
 fname = time.strftime("errorlog_%Y%m%d.txt", polltimet)
 ffullname = os.path.join(d,fname)
-if (not os.path.exists(ffullname)):
+
+buname = time.strftime("hmstats_%Y%m%d.rrd", polltimet)
+bufullname = os.path.join(dbup,buname)
+if (not os.path.exists(bufullname)):
+    # Backup not yet performed
 	print "Looks like a new day"
 	startofday = 1
 else:
@@ -120,9 +128,7 @@ else:
 # TODO Catch file not opened
 #sys.stderr = open(ffullname, 'a')  # Redirect stderr
 
-dbup = os.path.join(os.getcwd(),"backup")
-if not os.path.exists(dbup):
-	os.makedirs(dbup)
+
 
 fcsvfile = 'heatmiser_status.csv'
 
@@ -130,8 +136,6 @@ statusfile = 'heatmiser_status.xml'
 	
 if startofday == 1:
 	print "Backing up files"
-	buname = time.strftime("hmstats_%Y%m%d.rrd", polltimet)
-	bufullname = os.path.join(dbup,buname)
 	shutil.copy2(rrdfile,bufullname)
 	buname = time.strftime("hmoptimstart%Y%m%d.rrd", polltimet)
 	bufullname = os.path.join(dbup,buname)
