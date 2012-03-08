@@ -97,7 +97,11 @@
                     </xsl:choose>
 				</td>
                 <td title="roomset">
-					<xsl:value-of select="./t:roomset" /><sup>o</sup>
+                    <xsl:choose>
+                        <xsl:when test="./t:onoff = 0">OFF <small>(<xsl:value-of select="./t:roomset" /><sup>o</sup>)</small></xsl:when>
+                        <xsl:when test="./t:onoff = 1"><xsl:value-of select="./t:roomset" /><sup>o</sup></xsl:when>
+                        <xsl:otherwise>UNKNWON</xsl:otherwise>
+                    </xsl:choose>
 				</td>
                 <td title="thisdemand">
                     <xsl:choose>
