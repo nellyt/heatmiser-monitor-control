@@ -99,7 +99,13 @@
                 <td title="roomset">
                     <xsl:choose>
                         <xsl:when test="./t:onoff = 0">OFF <small>(<xsl:value-of select="./t:roomset" /><sup>o</sup>)</small></xsl:when>
-                        <xsl:when test="./t:onoff = 1"><xsl:value-of select="./t:roomset" /><sup>o</sup></xsl:when>
+                        <xsl:when test="./t:onoff = 1">
+                            <xsl:choose>
+                                <xsl:when test="./t:runmode = 0"><xsl:value-of select="./t:roomset" /><sup>o</sup></xsl:when>
+                                <xsl:when test="./t:runmode = 1">FROST <small>(<xsl:value-of select="./t:frosttemp" /><sup>o</sup>)</small></xsl:when>
+                                <xsl:otherwise>UNKNWON</xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
                         <xsl:otherwise>UNKNWON</xsl:otherwise>
                     </xsl:choose>
 				</td>
