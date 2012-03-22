@@ -225,6 +225,8 @@ for controller in StatList:
 	unhealthy[loop] = 0
 	# TODO is not V3 controller raise error
 	destination = loop
+	if startofday == 1:
+		hmUpdateTime(destination, serport)
 	start_low = 0
 	start_high = 0
 	read_length_high = (RW_LENGTH_ALL & 0xff)

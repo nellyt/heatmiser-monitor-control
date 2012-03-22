@@ -65,48 +65,10 @@ for controller in StatList:
 	badresponse[loop] = 0
 	# TODO is not V3 controller raise error
 	destination = loop
-	msgtime = time.time()
-	msgtimet = time.localtime(msgtime)
-	day  = int(time.strftime("%w", msgtimet))
-	if (day == 0):
-		day = 7		# Convert python day format to Heatmiser format
-	hour = int(time.strftime("%H", msgtimet))
-	mins = int(time.strftime("%M", msgtimet))
-	secs = int(time.strftime("%S", msgtimet))
-	if (secs == 61):
-		secs = 60 # Need to do this as pyhton seconds can be  [0,61]
-	print "%d %d:%d:%d" % (day, hour, mins, secs)
-	payload = [day, hour, mins, secs]
-	msg = hmFormMsgCRC(destination, controller[SL_CONTR_TYPE], MY_MASTER_ADDR, FUNC_WRITE, CUR_TIME_ADDR, payload)
-	print msg
-	# http://stackoverflow.com/questions/180606/how-do-i-convert-a-list-of-ascii-values-to-a-string-in-python
-	string = ''.join(map(chr,msg))
-	#print string
+	hmUpdateTime(destination, serport)
 
-	#Now try converting it back as a double check
-	#datal = []
-	#datal = datal + (map(ord,string))
-	#print datal
-	try:
-		written = serport.write(string)  # Write a string
-	except serial.SerialTimeoutException, e:
-		s= "%s : Write timeout error: %s\n" % (localtime, e)
-		sys.stderr.write(s)
-		badresponse[loop] += 1
-
-	# Now wait for reply
-	byteread = serport.read(100)	# NB max return is 75 in 5/2 mode or 159 in 7day mode
-	# @todo must cope with 7 day return size
-
-	#Now try converting it back to array
-	datal = []
-	datal = datal + (map(ord,byteread))
-	
-	if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, controller[3], destination, FUNC_WRITE, 2, datal) == False):
-		badresponse[loop] += 1
-
-	if badresponse[loop] == 0:
-		print "All OK, time set in Controller %s" % loop
+	# if badresponse[loop] == 0:
+		# print "All OK, time set in Controller %s" % loop
 
 	loop = loop+1 # Change to for loop TODO not used
 	time.sleep(2) # sleep for 2 seconds before next controller
