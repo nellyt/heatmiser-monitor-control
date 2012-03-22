@@ -274,6 +274,53 @@ def hmSetHolHours(destination, hours, serport) :
     try:
         written = serport.write(string)  # Write a string
     except serial.SerialTimeoutException, e:
+        # TODO local time not defined?
+        s= "%s : Write timeout error: %s\n" % (localtime, e)
+        sys.stderr.write(s)
+    # Now wait for reply
+    byteread = serport.read(100)	# NB max return is 75 in 5/2 mode or 159 in 7day mode
+    datal = []
+    datal = datal + (map(ord,byteread))
+
+    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, 2, datal) == False):
+        # badresponse[loop] += 1
+        print "OH DEAR BAD RESPONSE"
+    return 1
+    
+def hmUpdateTime(destination, serport) :
+    """bla bla"""
+    protocol = HMV3_ID # TODO should not be necessary to pass in protocol
+    if protocol == HMV3_ID:
+        msgtime = time.time()
+        msgtimet = time.localtime(msgtime)
+        day  = int(time.strftime("%w", msgtimet))
+        if (day == 0):
+            day = 7		# Convert python day format to Heatmiser format
+        hour = int(time.strftime("%H", msgtimet))
+        mins = int(time.strftime("%M", msgtimet))
+        secs = int(time.strftime("%S", msgtimet))
+        if (secs == 61):
+            secs = 60 # Need to do this as pyhton seconds can be  [0,61]
+        print "%d %d:%d:%d" % (day, hour, mins, secs)
+        payload = [day, hour, mins, secs]
+        #msg = hmFormMsgCRC(destination, controller[SL_CONTR_TYPE], MY_MASTER_ADDR, FUNC_WRITE, CUR_TIME_ADDR, payload)
+        msg = hmFormMsgCRC(destination, protocol, MY_MASTER_ADDR, FUNC_WRITE, CUR_TIME_ADDR, payload)
+        # TODO should not be necessary to pass in protocol as we can look that up in statlist
+        #msg = hmFormMsgCRC(destination, protocol, MY_MASTER_ADDR, FUNC_WRITE, HOL_HOURS_LO_ADDR, payload)
+    else:
+        "Un-supported protocol found %s" % protocol
+        assert 0, "Un-supported protocol found %s" % protocol
+        # TODO return error/exception
+        
+    print msg
+    # http://stackoverflow.com/questions/180606/how-do-i-convert-a-list-of-ascii-values-to-a-string-in-python
+    string = ''.join(map(chr,msg))
+    
+    #TODO Need a send msg method
+    
+    try:
+        written = serport.write(string)  # Write a string
+    except serial.SerialTimeoutException, e:
         s= "%s : Write timeout error: %s\n" % (localtime, e)
         sys.stderr.write(s)
     # Now wait for reply
