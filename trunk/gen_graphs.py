@@ -8,7 +8,7 @@ import sys
 
 import os
 
-from stats_defn import StatList
+from stats_defn import *
 
 d = os.path.join(os.getcwd(),"graphs")
 if not os.path.exists(d):
@@ -19,6 +19,7 @@ problem = 0
 rrdfile = 'hmstats.rrd'
 rrdrocfile = 'hmoptimstart.rrd'
 rrdtimeerrfile = 'hmtimedelta.rrd'
+rrdloadfile = 'hmload.rrd'
 
 graphs = [
 #["Today"],
@@ -95,12 +96,12 @@ height = '150'
 cur_date = time.strftime('%m/%d/%Y %H\:%M\:%S', time.localtime())       
 cmd_graph = 'rrdtool graph ' + output_filename
 for controller in StatList:
-	cmd_graph += ' DEF:' + controller[1] + 'roc=' + rrdrocfile + ':' + controller[1] + 'roc' + ':AVERAGE'
-	cmd_graph += ' DEF:' + controller[1] + 'os=' + rrdrocfile + ':' + controller[1] + 'optimstart' + ':AVERAGE'
-	cmd_graph += ' LINE:' + controller[1] + 'roc#' + controller[4] + ':' + controller[1]
-	cmd_graph += ' LINE:' + controller[1] + 'os#' + controller[4]
-	cmd_graph += ' VDEF:' + controller[1]  + 'last=' + controller[1] + 'roc' + ',LAST'
-	cmd_graph += ' GPRINT:' + controller[1]  + 'last:"' + controller[1] + ' ROC   = %6.2lf%S"'
+	cmd_graph += ' DEF:' + controller[1] + 'roc=' + rrdrocfile + ':' + controller[SL_SHRT_NAME] + 'roc' + ':AVERAGE'
+	cmd_graph += ' DEF:' + controller[SL_SHRT_NAME] + 'os=' + rrdrocfile + ':' + controller[SL_SHRT_NAME] + 'optimstart' + ':AVERAGE'
+	cmd_graph += ' LINE:' + controller[SL_SHRT_NAME] + 'roc#' + controller[SL_GRAPH_COL] + ':' + controller[SL_SHRT_NAME]
+	cmd_graph += ' LINE:' + controller[SL_SHRT_NAME] + 'os#' + controller[SL_GRAPH_COL]
+	cmd_graph += ' VDEF:' + controller[SL_SHRT_NAME]  + 'last=' + controller[SL_SHRT_NAME] + 'roc' + ',LAST'
+	cmd_graph += ' GPRINT:' + controller[SL_SHRT_NAME]  + 'last:"' + controller[SL_SHRT_NAME] + ' ROC   = %6.2lf%S"'
 			  
 cmd_graph += ' COMMENT:"Generated ' + cur_date + '"' + \
 ' --title="Optim Start Data"' + \
@@ -117,7 +118,7 @@ if len(cmd_output) > 0:
 	print cmd_output
 
 # Now the timeerr graph
-start_time = '-8week'  
+start_time = '-4week'  
 output_filename = 'graphs/' + 'timeerr.png'
 end_time = 'now'
 width = '400'
@@ -125,10 +126,10 @@ height = '150'
 cur_date = time.strftime('%m/%d/%Y %H\:%M\:%S', time.localtime())       
 cmd_graph = 'rrdtool graph ' + output_filename
 for controller in StatList:
-	cmd_graph += ' DEF:' + controller[1] + 'err=' + rrdtimeerrfile + ':' + controller[1] + 'timedelta' + ':AVERAGE'
-	cmd_graph += ' LINE:' + controller[1] + 'err#' + controller[4] + ':' + controller[1]
-	cmd_graph += ' VDEF:' + controller[1]  + 'last=' + controller[1] + 'err' + ',LAST'
-	cmd_graph += ' GPRINT:' + controller[1]  + 'last:"' + controller[1] + ' Err   = %6.1lf%S"'
+	cmd_graph += ' DEF:' + controller[SL_SHRT_NAME] + 'err=' + rrdtimeerrfile + ':' + controller[SL_SHRT_NAME] + 'timedelta' + ':AVERAGE'
+	cmd_graph += ' LINE:' + controller[SL_SHRT_NAME] + 'err#' + controller[SL_GRAPH_COL] + ':' + controller[SL_SHRT_NAME]
+	cmd_graph += ' VDEF:' + controller[SL_SHRT_NAME]  + 'last=' + controller[SL_SHRT_NAME] + 'err' + ',LAST'
+	cmd_graph += ' GPRINT:' + controller[SL_SHRT_NAME]  + 'last:"' + controller[SL_SHRT_NAME] + ' Err   = %6.1lf%S"'
 			
 cmd_graph += ' COMMENT:"Generated ' + cur_date + '"' + \
 ' --title="Time Error Data"' + \
@@ -136,16 +137,54 @@ cmd_graph += ' COMMENT:"Generated ' + cur_date + '"' + \
 ' --start=' + start_time + \
 ' --end=' + end_time + \
 ' --width=1000' + \
-' --height=300' + \
-' --upper-limit=120' + \
-' --lower-limit=-120' + \
-' --rigid'
+' --height=300'
 print cmd_graph
 cmd = os.popen4(cmd_graph)
 cmd_output = cmd[1].read()
 for fd in cmd: fd.close()
 if len(cmd_output) > 0:
 	print cmd_output
+    
+LoadList = [
+["zoneload", "A020F0"],
+["circuitload", "6B8E23"],
+["areaload", "6A5ACD"],
+]
+    
+# Now the load graph
+for graph in graphs:
+    start_time = graph[1] 
+    output_filename = 'graphs/' + 'load'+ '_' + graph[0] + '.png'
+    end_time = graph[2]
+    width = '400'
+    height = '150'
+    cur_date = time.strftime('%m/%d/%Y %H\:%M\:%S', time.localtime())       
+    cmd_graph = 'rrdtool graph ' + output_filename
+    for load in LoadList:
+        print load
+        cmd_graph += ' DEF:' + load[0] + '=' + rrdloadfile + ':' + load[0] + ':MAX'
+        cmd_graph += ' LINE:' + load[0] + '#' + load[1] + ':' + load[0]
+        cmd_graph += ' VDEF:' + load[0]  + 'last=' + load[0] + ',LAST'
+        cmd_graph += ' GPRINT:' + load[0]  + 'last:"' + load[0] + ' = %6.1lf%S"'
+                
+    cmd_graph += ' COMMENT:"Generated ' + cur_date + '"' + \
+    ' --title="Load Data'+ ' ' + graph[0] + '"' + \
+    ' --vertical-label="Load (m^2)"' + \
+    ' --start=' + start_time + \
+    ' --end=' + end_time + \
+    ' --width=1000' + \
+    ' --height=300' + \
+    ' --lower-limit=0' + \
+    ' --rigid'
+
+    # ' --upper-limit=400'
+
+    print cmd_graph
+    cmd = os.popen4(cmd_graph)
+    cmd_output = cmd[1].read()
+    for fd in cmd: fd.close()
+    if len(cmd_output) > 0:
+        print cmd_output
 	
 #From heating.py
 # Last four weeks: --start end-4w --end 00:00
@@ -166,7 +205,7 @@ if len(cmd_output) > 0:
 # @todo move to gengraphs.py
 for controller in StatList:
 	start_time = '-3day'  
-	output_filename = 'graphs/' + controller[1] + '.png'
+	output_filename = 'graphs/' + controller[SL_SHRT_NAME] + '.png'
 	end_time = 'now'
 	ds_name = 'Air'
 	ds_name2 = 'Floor'
@@ -176,10 +215,10 @@ for controller in StatList:
 	height = '150'
 	cur_date = time.strftime('%m/%d/%Y %H\:%M\:%S', time.localtime())       
 	cmd_graph = 'rrdtool graph ' + output_filename + \
-		' DEF:' + ds_name + '=' + rrdfile + ':' + controller[1] + 'air' + ':AVERAGE' + \
-		' DEF:' + ds_name2 + '=' + rrdfile + ':' + controller[1] + 'flr' + ':AVERAGE' + \
-		' DEF:' + ds_name3 + '=' + rrdfile + ':' + controller[1] + 'set' + ':AVERAGE' + \
-		' DEF:' + ds_name4 + '=' + rrdfile + ':' + controller[1] + 'dem' + ':MAX' + \
+		' DEF:' + ds_name + '=' + rrdfile + ':' + controller[SL_SHRT_NAME] + 'air' + ':AVERAGE' + \
+		' DEF:' + ds_name2 + '=' + rrdfile + ':' + controller[SL_SHRT_NAME] + 'flr' + ':AVERAGE' + \
+		' DEF:' + ds_name3 + '=' + rrdfile + ':' + controller[SL_SHRT_NAME] + 'set' + ':AVERAGE' + \
+		' DEF:' + ds_name4 + '=' + rrdfile + ':' + controller[SL_SHRT_NAME] + 'dem' + ':MAX' + \
 		' VDEF:' + ds_name  + 'last=' + ds_name  + ',LAST' + \
 		' VDEF:' + ds_name2 + 'last=' + ds_name2 + ',LAST' + \
 		' VDEF:' + ds_name3 + 'last=' + ds_name3 + ',LAST' + \

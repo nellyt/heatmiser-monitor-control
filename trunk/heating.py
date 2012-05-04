@@ -95,6 +95,26 @@ if (not os.path.exists(rrdtimeerrfile)):
 	if len(cmd_output) > 0:
 		print cmd_output
 			
+# Now one for Load
+interval = 600
+interval = str(interval) 
+interval_mins = float(interval) / 60  
+heartbeat = str(int(interval) * 2)
+rrdloadfile = 'hmload.rrd'
+if (not os.path.exists(rrdloadfile)):
+	print "Creating file %s" % (rrdloadfile)
+	cmd_create = "rrdtool create %s --step %s" % (rrdloadfile, interval)
+	cmd_create += " DS:zoneload:GAUGE:%s:0:1000" % (heartbeat)
+	cmd_create += " DS:circuitload:GAUGE:%s:0:1000" % (heartbeat)
+	cmd_create += " DS:areaload:GAUGE:%s:0:1000" % (heartbeat)
+	cmd_create +=  ' RRA:MAX:0.5:1:35040'
+	
+	print cmd_create
+	cmd = os.popen4(cmd_create)
+	cmd_output = cmd[1].read()
+	for fd in cmd: fd.close()
+	if len(cmd_output) > 0:
+		print cmd_output
 
 # Generate a RFC2822 format date
 # This works with both Excel and Timeline
@@ -547,6 +567,47 @@ for controller in StatList:
 		cmd_update += ":U"
 	else:
 		cmd_update += ":%s" % (timeerr[controller[0]])
+	
+print cmd_update
+cmd = os.popen4(cmd_update)
+cmd_output = cmd[1].read()
+for fd in cmd: fd.close()
+if len(cmd_output) > 0:
+	print cmd_output
+
+#Update load
+cmd_update =  "rrdtool update %s N" % (rrdloadfile)
+zoneload = 0
+circuitload = 0
+areaload = 0
+ohdearerror = 0
+for controller in StatList:
+	print "controller %d" % controller[0]
+	if (badresponse[controller[0]] > 1) :
+		ohdearerror = 1
+	else:
+		if (demand[controller[0]] == 1) :
+			zoneload += 1
+			zone_area = 0
+			for circuit in controller[SL_CIRCUITS]:
+				circuit_area = 0            
+				circuitload += 1
+				print "Circuit %d %s" % (circuit, CircuitList[circuit-1][CL_SHRT_NAME])
+# Would be best to lookup rather than index here   
+				for rectangle in CircuitList[circuit-1][CL_RECTANGLES]:
+					print rectangle
+					rect_area = rectangle[0]*rectangle[1]
+					print "rect area %f" % rect_area
+					circuit_area += rect_area
+				zone_area += circuit_area
+				print "circuit area %f" % circuit_area
+			print "zone area %f" % zone_area
+			areaload += zone_area
+        
+
+cmd_update += ":%s" % (zoneload)
+cmd_update += ":%s" % (circuitload)
+cmd_update += ":%s" % (areaload)
 	
 print cmd_update
 cmd = os.popen4(cmd_update)
