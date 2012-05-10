@@ -7,6 +7,8 @@
 HMV2_ID = 2
 HMV3_ID = 3
 
+BYTEMASK = 0xff
+
 #
 # HM Version 3 Magic Numbers
 #
