@@ -18,7 +18,6 @@ from hm_constants import *
 # Believe this is known as CCITT (0xFFFF)
 # This is the CRC function converted directly from the Heatmiser C code 
 # provided in their API
-# @todo Put in a util class
 class crc16:
     LookupHigh = [
     0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70,
@@ -29,8 +28,8 @@ class crc16:
     0x08, 0x29, 0x4a, 0x6b, 0x8c, 0xad, 0xce, 0xef
     ]
     def __init__(self):
-        self.high = 0xff
-        self.low = 0xff
+        self.high = BYTEMASK
+        self.low = BYTEMASK
     
     def Update4Bits(self, val):
         # Step one, extract the Most significant 4 bits of the CRC register
@@ -44,16 +43,16 @@ class crc16:
         
         # Shift the CRC Register left 4 bits
         self.high = (self.high << 4)|(self.low>>4)
-        self.high = self.high & 0xff    # force char
+        self.high = self.high & BYTEMASK    # force char
         self.low = self.low <<4
-        self.low = self.low & 0xff  # force char
+        self.low = self.low & BYTEMASK  # force char
         
         # Do the table lookups and XOR the result into the CRC tables
         #print "t for lookup is %d" % (t)
         self.high = self.high ^ self.LookupHigh[t]
-        self.high = self.high & 0xff    # force char
+        self.high = self.high & BYTEMASK    # force char
         self.low  = self.low  ^ self.LookupLow[t]
-        self.low = self.low & 0xff  # force char
+        self.low = self.low & BYTEMASK  # force char
         #print "high is %d Low is %d" % (self.high, self.low)
 
     def CRC16_Update(self, val):
@@ -74,16 +73,16 @@ class crc16:
 def hmFormMsg(destination, protocol, source, function, start, payload) :
   """Forms a message payload, excluding CRC"""
   if protocol == HMV3_ID:
-    start_low = (start & 0xff)
-    start_high = (start >> 8) & 0xff
+    start_low = (start & BYTEMASK)
+    start_high = (start >> 8) & BYTEMASK
     if function == FUNC_READ:
       payloadLength = 0
-      length_low = (RW_LENGTH_ALL & 0xff)
-      length_high = (RW_LENGTH_ALL >> 8) & 0xff 
+      length_low = (RW_LENGTH_ALL & BYTEMASK)
+      length_high = (RW_LENGTH_ALL >> 8) & BYTEMASK 
     else:
       payloadLength = len(payload)
-      length_low = (payloadLength & 0xff)
-      length_high = (payloadLength >> 8) & 0xff 
+      length_low = (payloadLength & BYTEMASK)
+      length_high = (payloadLength >> 8) & BYTEMASK 
     msg = [destination, 10+payloadLength, source, function, start_low, start_high, length_low, length_high]
     if function == FUNC_WRITE:
       msg = msg + payload
@@ -202,7 +201,7 @@ def hmKeyLock_Off(destination, serport) :
 
 def hmKeyLock(destination, state, serport) :
     """bla bla"""
-    protocol = HMV3_ID # TODO should not be necessary to pass in protocol
+    protocol = HMV3_ID # TODO should look this up in statlist
     if protocol == HMV3_ID:
         payload = [state]
         # TODO should not be necessary to pass in protocol as we can look that up in statlist
@@ -225,7 +224,7 @@ def hmKeyLock(destination, state, serport) :
         s= "%s : Write timeout error: %s\n" % (localtime, e)
         sys.stderr.write(s)
     # Now wait for reply
-    byteread = serport.read(100)	# NB max return is 75 in 5/2 mode or 159 in 7day mode
+    byteread = serport.read(100)    # NB max return is 75 in 5/2 mode or 159 in 7day mode
     datal = []
     datal = datal + (map(ord,byteread))
 
@@ -252,10 +251,10 @@ def hmSetHolEnd(destination, enddatetime, serport) :
 
 def hmSetHolHours(destination, hours, serport) :
     """bla bla"""
-    protocol = HMV3_ID # TODO should not be necessary to pass in protocol
+    protocol = HMV3_ID # TODO should look this up in statlist
     if protocol == HMV3_ID:
-        hours_lo = (hours & 0xff)
-        hours_hi = (hours >> 8) & 0xff
+        hours_lo = (hours & BYTEMASK)
+        hours_hi = (hours >> 8) & BYTEMASK
         payload = [hours_lo, hours_hi]
         # TODO should not be necessary to pass in protocol as we can look that up in statlist
         msg = hmFormMsgCRC(destination, protocol, MY_MASTER_ADDR, FUNC_WRITE, HOL_HOURS_LO_ADDR, payload)
@@ -278,7 +277,7 @@ def hmSetHolHours(destination, hours, serport) :
         s= "%s : Write timeout error: %s\n" % (localtime, e)
         sys.stderr.write(s)
     # Now wait for reply
-    byteread = serport.read(100)	# NB max return is 75 in 5/2 mode or 159 in 7day mode
+    byteread = serport.read(100)    # NB max return is 75 in 5/2 mode or 159 in 7day mode
     datal = []
     datal = datal + (map(ord,byteread))
 
@@ -289,7 +288,7 @@ def hmSetHolHours(destination, hours, serport) :
     
 def hmUpdateTime(destination, serport) :
     """bla bla"""
-    protocol = HMV3_ID # TODO should not be necessary to pass in protocol
+    protocol = HMV3_ID # TODO should look this up in statlist
     if protocol == HMV3_ID:
         msgtime = time.time()
         msgtimet = time.localtime(msgtime)
@@ -324,7 +323,7 @@ def hmUpdateTime(destination, serport) :
         s= "%s : Write timeout error: %s\n" % (localtime, e)
         sys.stderr.write(s)
     # Now wait for reply
-    byteread = serport.read(100)	# NB max return is 75 in 5/2 mode or 159 in 7day mode
+    byteread = serport.read(100)    # NB max return is 75 in 5/2 mode or 159 in 7day mode
     datal = []
     datal = datal + (map(ord,byteread))
 
