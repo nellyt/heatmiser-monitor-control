@@ -1,7 +1,7 @@
 #
 # Neil Trimboy 2011
 #
-# Sets current time/date to all controllers
+# Sets holiday mode to all controllers
 #
 # Despite Heatmiser V3 protocol document stating that current day/h/m/s is on 4 separate addresses [43,46]
 # Tests showed that it was not possible to write to individual value anf that all 4 values must be written in a single command
@@ -12,16 +12,11 @@ import sys
 import os
 from datetime import datetime
 
-#from stats_defn import StatList
 from stats_defn import *
 from hm_constants import *
 from hm_utils import *
 
-#def hmSetTime(destination, now)
-
 # CODE STARTS HERE
-
-# Define magic numbers used in messages
 
 problem = 0
 
@@ -37,7 +32,7 @@ localtime = time.strftime("%d %b %Y %H:%M:%S +0000", polltimet)
 localday  = time.strftime("%w", polltimet)
 
 serport = serial.Serial()
-serport.port     = 6 # 1 less than coim port, USB is 6=com7, ether is 9=10
+serport.port     = 6 # 1 less than com port, USB is 6=com7, ether is 9=10
 serport.baudrate = 4800
 serport.bytesize = serial.EIGHTBITS
 serport.parity   = serial.PARITY_NONE
@@ -65,15 +60,15 @@ enddatetime = datetime(2012, 01, 27, 01, 30)
 
 # CYCLE THROUGH ALL CONTROLLERS
 for controller in StatList:
-	loop = controller[0] #BUG assumes statlist is addresses are 1...n, with no gaps or random
-	print
-	print "Testing control %2d in %s *****************************" % (loop, controller[2])
-	badresponse[loop] = 0
-	# TODO is not V3 controller raise error
-	destination = loop
-	hmSetHolEnd(destination, enddatetime, serport)
+    loop = controller[0] #BUG assumes statlist is addresses are 1...n, with no gaps or random
+    print
+    print "Testing control %2d in %s *****************************" % (loop, controller[2])
+    badresponse[loop] = 0
+    # TODO is not V3 controller raise error
+    destination = loop
+    hmSetHolEnd(destination, enddatetime, serport)
 
-	time.sleep(2) # sleep for 2 seconds before next controller
+    time.sleep(2) # sleep for 2 seconds before next controller
 
 #END OF CYCLE THROUGH CONTROLLERS
 print serport
@@ -83,4 +78,4 @@ print "Port is now %s" % serport.isOpen()
 #ferr.close()
 
 #if (problem > 0):
-	#mail(you, "Heatmiser TimeSet Error ", "A Problem has occurred", "errorlog.txt")
+    #mail(you, "Heatmiser TimeSet Error ", "A Problem has occurred", "errorlog.txt")

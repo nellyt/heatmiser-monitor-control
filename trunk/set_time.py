@@ -11,14 +11,11 @@ import time
 import sys
 import os
 
-#from stats_defn import StatList
 from stats_defn import *
 from hm_constants import *
 from hm_utils import *
 
 # CODE STARTS HERE
-
-# Define magic numbers used in messages
 
 problem = 0
 
@@ -34,7 +31,7 @@ localtime = time.strftime("%d %b %Y %H:%M:%S +0000", polltimet)
 localday  = time.strftime("%w", polltimet)
 
 serport = serial.Serial()
-serport.port     = 6 # 1 less than coim port, USB is 6=com7, ether is 9=10
+serport.port     = 6 # 1 less than com port, USB is 6=com7, ether is 9=10
 serport.baudrate = 4800
 serport.bytesize = serial.EIGHTBITS
 serport.parity   = serial.PARITY_NONE
