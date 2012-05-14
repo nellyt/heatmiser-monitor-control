@@ -23,7 +23,6 @@ problem = 0
 sys.stderr = open('errorlog.txt', 'a') # Redirect stderr
 
 # Generate a RFC2822 format date
-# This works with both Excel and Timeline
 localtime = time.asctime( time.localtime(time.time()))
 polltime  = time.time()
 polltimet = time.localtime(polltime)
@@ -49,21 +48,15 @@ except serial.SerialException, e:
 print "%s port configuration is %s" % (serport.name, serport.isOpen())
 print "%s baud, %s bit, %s parity, with %s stopbits, timeout %s seconds" % (serport.baudrate, serport.bytesize, serport.parity, serport.stopbits, serport.timeout)
 
-#good = [0,0,0,0,0,0,0,0,0,0,0,0,0] # TODO one bigger than size required YUK
-#bad =  [0,0,0,0,0,0,0,0,0,0,0,0,0]
-
-badresponse = range(12+1) #TODO hardcoded 12 here! YUK
-
 # CYCLE THROUGH ALL CONTROLLERS
 for controller in StatList:
     loop = controller[0] #BUG assumes statlist is addresses are 1...n, with no gaps or random
     print
     print "Testing control %2d in %s *****************************" % (loop, controller[2])
-    badresponse[loop] = 0
-    # TODO is not V3 controller raise error
+    # TODO if not V3 controller raise error This should really be detected in API
     destination = loop
+    destination = 1 # hard code to study
     hmKeyLock_Off(destination, serport)
-
     time.sleep(2) # sleep for 2 seconds before next controller
 
 #END OF CYCLE THROUGH CONTROLLERS
