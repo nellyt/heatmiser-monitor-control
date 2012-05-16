@@ -7,6 +7,8 @@ PRT-EN and PRT_ENTS controllers use the V3 protocol.
 
 == Documentation Errors ==
 
+_These refer to the V3.0 specification. A newer 3.7 does exists that has not been checked_
+
 There are a few errors and ambiguities in Heatmiser's documentation, mainly in the details of the "DCB structure" that provides the thermostat's configuration and status. The correct details were determined by reverse engineering responses from PRT-EN and PRT-ENTS thermostats and trial and error. Some differences are unresolved. There appear to be more differences with the PRT-*ENTS* controller
 
   * PRT_ENTS only : Frost mode (addr 7) is reported differently to spec. Currently unresolved
