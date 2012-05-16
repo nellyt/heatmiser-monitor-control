@@ -216,8 +216,6 @@ def hmKeyLock(destination, state, serport) :
 
     #TODO Need a send msg method
 
-    print serport
-
     try:
         written = serport.write(string)  # Write a string
     except serial.SerialTimeoutException, e:
@@ -229,7 +227,6 @@ def hmKeyLock(destination, state, serport) :
     datal = datal + (map(ord,byteread))
 
     if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, 2, datal) == False):
-        # badresponse[loop] += 1
         print "OH DEAR BAD RESPONSE"
     return 1
 
@@ -268,8 +265,6 @@ def hmSetHolHours(destination, hours, serport) :
 
     #TODO Need a send msg method
 
-    print serport
-
     try:
         written = serport.write(string)  # Write a string
     except serial.SerialTimeoutException, e:
@@ -282,7 +277,6 @@ def hmSetHolHours(destination, hours, serport) :
     datal = datal + (map(ord,byteread))
 
     if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, 2, datal) == False):
-        # badresponse[loop] += 1
         print "OH DEAR BAD RESPONSE"
     return 1
 
@@ -328,7 +322,6 @@ def hmUpdateTime(destination, serport) :
     datal = datal + (map(ord,byteread))
 
     if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, 2, datal) == False):
-        # badresponse[loop] += 1
         print "OH DEAR BAD RESPONSE"
     return 1
 
@@ -360,6 +353,5 @@ def hmSetTemp(destination, temp, serport) :
     datal = datal + (map(ord,byteread))
 
     if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, 2, datal) == False):
-        # badresponse[loop] += 1
         print "OH DEAR BAD RESPONSE"
     return 1
