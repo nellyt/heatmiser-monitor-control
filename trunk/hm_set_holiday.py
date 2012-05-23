@@ -50,13 +50,13 @@ print "%s port configuration is %s" % (serport.name, serport.isOpen())
 print "%s baud, %s bit, %s parity, with %s stopbits, timeout %s seconds" % (serport.baudrate, serport.bytesize, serport.parity, serport.stopbits, serport.timeout)
 
 # Put the Holiday end date you want here
-enddatetime = datetime(2012, 01, 27, 01, 30)
+enddatetime = datetime(2012, 02, 18, 9, 00)
 
 # CYCLE THROUGH ALL CONTROLLERS
 for controller in StatList:
-    loop = controller[0] #BUG assumes statlist is addresses are 1...n, with no gaps or random
+    loop = controller[SL_ADDR] #BUG assumes statlist is addresses are 1...n, with no gaps or random
     print
-    print "Testing control %2d in %s *****************************" % (loop, controller[2])
+    print "Testing control %2d in %s *****************************" % (loop, controller[SL_LONG_NAME])
     # TODO if not V3 controller raise error This should really be detected in API
     destination = loop
     hmSetHolEnd(destination, enddatetime, serport)
