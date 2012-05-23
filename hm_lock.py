@@ -50,13 +50,14 @@ print "%s baud, %s bit, %s parity, with %s stopbits, timeout %s seconds" % (serp
 
 # CYCLE THROUGH ALL CONTROLLERS
 for controller in StatList:
-    loop = controller[0] #BUG assumes statlist is addresses are 1...n, with no gaps or random
+    loop = controller[SL_ADDR] #BUG assumes statlist is addresses are 1...n, with no gaps or random
     print
-    print "Testing control %2d in %s *****************************" % (loop, controller[2])
+    print "Testing control %2d in %s *****************************" % (loop, controller[SL_LONG_NAME])
     # TODO if not V3 controller raise error This should really be detected in API
     destination = loop
     destination = 1 # hard code to study
-    hmKeyLock_Off(destination, serport)
+    #hmKeyLock_Off(destination, serport)
+    hmKeyLock_On(12, serport)
     time.sleep(2) # sleep for 2 seconds before next controller
 
 #END OF CYCLE THROUGH CONTROLLERS
