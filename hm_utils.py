@@ -226,7 +226,7 @@ def hmKeyLock(destination, state, serport) :
     datal = []
     datal = datal + (map(ord,byteread))
 
-    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, 2, datal) == False):
+    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, DONT_CARE_LENGTH, datal) == False):
         print "OH DEAR BAD RESPONSE"
     return 1
 
@@ -276,7 +276,7 @@ def hmSetHolHours(destination, hours, serport) :
     datal = []
     datal = datal + (map(ord,byteread))
 
-    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, 2, datal) == False):
+    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, DONT_CARE_LENGTH, datal) == False):
         print "OH DEAR BAD RESPONSE"
     return 1
 
@@ -321,7 +321,7 @@ def hmUpdateTime(destination, serport) :
     datal = []
     datal = datal + (map(ord,byteread))
 
-    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, 2, datal) == False):
+    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, DONT_CARE_LENGTH, datal) == False):
         print "OH DEAR BAD RESPONSE"
     return 1
 
@@ -352,6 +352,42 @@ def hmSetTemp(destination, temp, serport) :
     datal = []
     datal = datal + (map(ord,byteread))
 
-    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, 2, datal) == False):
+    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, DONT_CARE_LENGTH, datal) == False):
+        print "OH DEAR BAD RESPONSE"
+    return 1
+    
+def hmHoldTemp(destination, temp, minutes, serport) :
+    """bla bla"""
+    hmSetTemp(destination, temp, serport)
+    time.sleep(2) # sleep for 2 seconds before next controller
+    protocol = HMV3_ID # TODO should look this up in statlist
+    if protocol == HMV3_ID:
+        minutes_lo = (minutes & BYTEMASK)
+        minutes_hi = (minutes >> 8) & BYTEMASK
+        payload = [minutes_lo, minutes_hi]
+        # TODO should not be necessary to pass in protocol as we can look that up in statlist
+        # TODO address - is this different for a read? think so , so how do constant
+        msg = hmFormMsgCRC(destination, protocol, MY_MASTER_ADDR, FUNC_WRITE, 32, payload)
+    else:
+        "Un-supported protocol found %s" % protocol
+        assert 0, "Un-supported protocol found %s" % protocol
+        # TODO return error/exception
+
+    print msg
+    string = ''.join(map(chr,msg))
+
+    #TODO Need a send msg method
+
+    try:
+        written = serport.write(string)  # Write a string
+    except serial.SerialTimeoutException, e:
+        s= "%s : Write timeout error: %s\n" % (localtime, e)
+        sys.stderr.write(s)
+    # Now wait for reply
+    byteread = serport.read(100)    # NB max return is 75 in 5/2 mode or 159 in 7day mode
+    datal = []
+    datal = datal + (map(ord,byteread))
+
+    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, DONT_CARE_LENGTH, datal) == False):
         print "OH DEAR BAD RESPONSE"
     return 1
