@@ -194,28 +194,29 @@ except serial.SerialException, e:
 
 print "%s port configuration is %s" % (serport.name, serport.isOpen())
 print "%s baud, %s bit, %s parity, with %s stopbits, timeout %s seconds" % (serport.baudrate, serport.bytesize, serport.parity, serport.stopbits, serport.timeout)
- 
+
+number_of_controllers = len(StatList)
+print "No of controllers is %d" % (number_of_controllers)
 # How initialise good and bad to zero?
 #good = 0
 #bad = 0
 good = [0,0,0,0,0,0,0,0,0,0,0,0,0] #one bigger than size required
 bad =  [0,0,0,0,0,0,0,0,0,0,0,0,0]
-remoteairtemp = range(12+1)
-floortemp = range(12+1)
-intairtemp = range(12+1)
-demand = range(12+1)
-settemp = range(12+1)
-result = range(13)
-sensormode = range(12+1)
-badresponse = range(12+1)
-unhealthy = range(12+1)
-optimstart = range(12+1)
-rateofchange = range(12+1)
-timeerr = range(12+1)
+remoteairtemp = range(number_of_controllers+1)
+floortemp = range(number_of_controllers+1)
+intairtemp = range(number_of_controllers+1)
+demand = range(number_of_controllers+1)
+settemp = range(number_of_controllers+1)
+result = range(number_of_controllers+1)
+sensormode = range(number_of_controllers+1)
+badresponse = range(number_of_controllers+1)
+unhealthy = range(number_of_controllers+1)
+optimstart = range(number_of_controllers+1)
+rateofchange = range(number_of_controllers+1)
+timeerr = range(number_of_controllers+1)
 
-# CYCLE THROUGH 12 CONTROLLERS
+# CYCLE THROUGH number_of_controllers CONTROLLERS
 f = open(statusfile, 'w')
-
 
 f.write('<?xml version="1.0" encoding="ISO-8859-1"?>\n')
 f.write('<poll xmlns="http://www.example.org/history" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/history history.xsd ">\n')
@@ -501,8 +502,7 @@ fcsv = open(fcsvfile, 'a')
 s= localtime + ','
 fcsv.write(s)
 
-# TODO where is magic numer 13 from!	
-for loop in range(1, 13):
+for loop in range(1, number_of_controllers + 1):
     # TODO cope with bad response here
     if(badresponse[loop] == 0):
         print "Sensor %2d Temp is %d and %d and %d" % (loop, intairtemp[loop], remoteairtemp[loop], floortemp[loop])
