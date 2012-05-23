@@ -15,10 +15,6 @@ from hm_constants import *
 from hm_utils import *
 from mail_utils import *
 
-   
-   
-
- 
 # CODE STARTS HERE
 
 DATAOFFSET = 9 # ToDO Move this higher up and and define what it is, put in another file
@@ -31,8 +27,8 @@ TIME_ERR_LIMIT = 60
 problem = 0
 
 interval = 600 # 10 mins
-interval = str(interval) 
-interval_mins = float(interval) / 60  
+interval = str(interval)
+interval_mins = float(interval) / 60
 heartbeat = str(int(interval) * 2)
 rrdfile = 'hmstats.rrd'
 if (not os.path.exists(rrdfile)):
@@ -44,8 +40,8 @@ if (not os.path.exists(rrdfile)):
         cmd_create += " DS:%sflr:GAUGE:%s:-20:100" % (controller[1], heartbeat)
         cmd_create += " DS:%sset:GAUGE:%s:-20:100" % (controller[1], heartbeat)
         cmd_create += " DS:%sdem:GAUGE:%s:0:1" % (controller[1], heartbeat)
-    cmd_create +=  ' RRA:AVERAGE:0.5:1:35040'
-    cmd_create +=  ' RRA:MAX:0.5:1:35040'
+    cmd_create +=  ' RRA:AVERAGE:0.5:1:262800'
+    cmd_create +=  ' RRA:MAX:0.5:1:262800'
 
     print cmd_create
     cmd = os.popen4(cmd_create)
@@ -53,11 +49,11 @@ if (not os.path.exists(rrdfile)):
     for fd in cmd: fd.close()
     if len(cmd_output) > 0:
         print cmd_output
-            
+
 # Now one for Optimum Start
 interval = 600
-interval = str(interval) 
-interval_mins = float(interval) / 60  
+interval = str(interval)
+interval_mins = float(interval) / 60
 heartbeat = str(int(interval) * 2)
 rrdrocfile = 'hmoptimstart.rrd'
 if (not os.path.exists(rrdrocfile)):
@@ -66,7 +62,7 @@ if (not os.path.exists(rrdrocfile)):
     for controller in StatList:
         cmd_create += " DS:%sroc:GAUGE:%s:0:255" % (controller[1], heartbeat)
         cmd_create += " DS:%soptimstart:GAUGE:%s:0:3" % (controller[1], heartbeat)
-    cmd_create +=  ' RRA:AVERAGE:0.5:1:35040'
+    cmd_create +=  ' RRA:AVERAGE:0.5:1:262800'
 
     print cmd_create
     cmd = os.popen4(cmd_create)
@@ -74,11 +70,11 @@ if (not os.path.exists(rrdrocfile)):
     for fd in cmd: fd.close()
     if len(cmd_output) > 0:
         print cmd_output
-            
+
 # Now one for TimeError
 interval = 600
-interval = str(interval) 
-interval_mins = float(interval) / 60  
+interval = str(interval)
+interval_mins = float(interval) / 60
 heartbeat = str(int(interval) * 2)
 rrdtimeerrfile = 'hmtimedelta.rrd'
 if (not os.path.exists(rrdtimeerrfile)):
@@ -86,7 +82,7 @@ if (not os.path.exists(rrdtimeerrfile)):
     cmd_create = "rrdtool create %s --step %s" % (rrdtimeerrfile, interval)
     for controller in StatList:
         cmd_create += " DS:%stimedelta:GAUGE:%s:-172800:172800" % (controller[1], heartbeat)
-    cmd_create +=  ' RRA:AVERAGE:0.5:1:35040'
+    cmd_create +=  ' RRA:AVERAGE:0.5:1:262800'
 
     print cmd_create
     cmd = os.popen4(cmd_create)
@@ -94,11 +90,11 @@ if (not os.path.exists(rrdtimeerrfile)):
     for fd in cmd: fd.close()
     if len(cmd_output) > 0:
         print cmd_output
-            
+
 # Now one for Load
 interval = 600
-interval = str(interval) 
-interval_mins = float(interval) / 60  
+interval = str(interval)
+interval_mins = float(interval) / 60
 heartbeat = str(int(interval) * 2)
 rrdloadfile = 'hmload.rrd'
 if (not os.path.exists(rrdloadfile)):
@@ -107,7 +103,7 @@ if (not os.path.exists(rrdloadfile)):
     cmd_create += " DS:zoneload:GAUGE:%s:0:1000" % (heartbeat)
     cmd_create += " DS:circuitload:GAUGE:%s:0:1000" % (heartbeat)
     cmd_create += " DS:areaload:GAUGE:%s:0:1000" % (heartbeat)
-    cmd_create +=  ' RRA:MAX:0.5:1:35040'
+    cmd_create +=  ' RRA:MAX:0.5:1:262800'
 
     print cmd_create
     cmd = os.popen4(cmd_create)
@@ -131,7 +127,7 @@ if not os.path.exists(d):
 dbup = os.path.join(os.getcwd(),"backup")
 if not os.path.exists(dbup):
     os.makedirs(dbup)
-    
+
 fname = time.strftime("errorlog_%Y%m%d.txt", polltimet)
 ffullname = os.path.join(d,fname)
 
@@ -139,10 +135,10 @@ buname = time.strftime("hmstats_%Y%m%d.rrd", polltimet)
 bufullname = os.path.join(dbup,buname)
 if (not os.path.exists(bufullname)):
     # Backup not yet performed
-	print "Looks like a new day"
-	startofday = 1
+    print "Looks like a new day"
+    startofday = 1
 else:
-	startofday = 0
+    startofday = 0
 
 #ferr = open(ffullname, 'a')
 # TODO Catch file not opened
@@ -195,7 +191,7 @@ except serial.SerialException, e:
         problem += 1
         mail(email_settings.email_to_addr, "Heatmiser Polling Error ", "Could not open serial port", "errorlog.txt")
         sys.exit(1) # TODO this doesnt seem to exit
-        
+
 print "%s port configuration is %s" % (serport.name, serport.isOpen())
 print "%s baud, %s bit, %s parity, with %s stopbits, timeout %s seconds" % (serport.baudrate, serport.bytesize, serport.parity, serport.stopbits, serport.timeout)
  
@@ -238,29 +234,26 @@ f.write("<readable>" + localtime + "</readable>\n")
 f.write("</polltime>\n")
 # CYCLE THROUGH ALL CONTROLLERS
 for controller in StatList:
-    loop = controller[0]
+    loop = controller[SL_ADDR] #BUG assumes statlist is addresses are 1...n, with no gaps or random
     print loop
-    #data = [1,0x0a,0x81,0,0,0,0xff,0xff]
     print
-    print "Testing control %2d in %s *****************************" % (loop, controller[2])
+    print "Testing control ID %2d in %s *****************************" % (loop, controller[SL_LONG_NAME])
     badresponse[loop] = 0
     unhealthy[loop] = 0
     # TODO is not V3 controller raise error
-    destination = loop
+    destination = controller[SL_ADDR]
     if startofday == 1:
         hmUpdateTime(destination, serport)
     start_low = 0
     start_high = 0
     read_length_high = (RW_LENGTH_ALL & 0xff)
     read_length_low = (RW_LENGTH_ALL >> 8) & 0xff
-    data = [destination, 0x0a, MY_MASTER_ADDR, FUNC_READ, start_low, start_high, read_length_low, read_length_high]
-    #print data
-    # http://stackoverflow.com/questions/180606/how-do-i-convert-a-list-of-ascii-values-to-a-string-in-python
-    crc = crc16()
-    data = data + crc.run(data)
+    # data = [destination, 0x0a, MY_MASTER_ADDR, FUNC_READ, start_low, start_high, read_length_low, read_length_high]
+    # There is an implicit read ALL in the hmFormMsgCRC method
+    # @todo The 0 below is a magic nmbe which should be replaced
+    data = hmFormMsgCRC(destination, controller[SL_CONTR_TYPE], MY_MASTER_ADDR, FUNC_READ, 0, [])
     print data
-    #msg = hmFormMsgCRC(destination, controller[3], MY_MASTER_ADDR, FUNC_READ, CUR_TIME_ADDR, payload)
-    #print msg
+    # http://stackoverflow.com/questions/180606/how-do-i-convert-a-list-of-ascii-values-to-a-string-in-python
     string = ''.join(map(chr,data))
 
     #Now try converting it back
@@ -283,12 +276,12 @@ for controller in StatList:
     #TODO checking for length here can be removed
     if (len(byteread)) == 75:
         print  "Correct length reply received"
-        good[loop] = good[loop] + 1
+        good[loop] += 1
     else:
         print "Incorrect length reply %s" % (len(byteread))
-        bad[loop] = bad[loop] + 1
+        bad[loop] += 1
         s= "%s : Controller %2d : Incorrect length reply : %s\n" % (localtime, loop, len(byteread))
-        sys.stderr.write(s) 
+        sys.stderr.write(s)
         badresponse[loop] += 1
 
     # TODO All this should only happen if correct length reply
@@ -296,7 +289,7 @@ for controller in StatList:
     datal = []
     datal = datal + (map(ord,byteread))
 
-        
+
     if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, controller[SL_CONTR_TYPE], destination, FUNC_READ, 75, datal) == False):
         badresponse[loop] += 1
 
@@ -306,7 +299,7 @@ for controller in StatList:
         # @todo value in next line of 120 is a wrong guess
         # @todo put all the offset constants into other file/constants
         if ((len(byteread)) == 75) or ((len(byteread)) == 120):
-            
+
             vendor = datal[2+ DATAOFFSET]
             version = datal[3+ DATAOFFSET] & 0x7f
             floorlimiting = datal[3+ DATAOFFSET] >> 7
@@ -413,11 +406,10 @@ for controller in StatList:
             unhealthy[loop] += 1
             # TODO ++ here
         remoteseconds = (((currenthour * 60) + currentmin) * 60) + currentsec
-        
+
         nowhours = time.localtime(time.time()).tm_hour
         nowmins = time.localtime(time.time()).tm_min
         nowsecs = time.localtime(time.time()).tm_sec
-        print "%d %d %d" % (nowhours, nowmins, nowsecs)
         nowseconds = (((nowhours * 60) + nowmins) * 60) + nowsecs
         print "Time %d %d" % (remoteseconds, nowseconds)
         timeerr[loop] = nowseconds - remoteseconds
@@ -426,13 +418,13 @@ for controller in StatList:
             sys.stderr.write(s)
             unhealthy[loop] += 1
             # TODO ++ here
-        
+
     # END correct length
 
     print "Controller %2d Good %d Bad %d" % (loop, good[loop], bad[loop])
     if (badresponse[loop]== 0):
         f.write('<controller>\n')
-        f.write("<locationlong>" + controller[2] + "</locationlong>\n") 
+        f.write("<locationlong>" + controller[2] + "</locationlong>\n")
         f.write("<locationshort>" + controller[1] + "</locationshort>\n")
         f.write("<ident>" + repr(address) + "</ident>\n")
         f.write("<vendor>" + repr(vendor) + "</vendor>\n")
@@ -457,7 +449,7 @@ for controller in StatList:
         f.write("<onoff>" + repr(onoff) + "</onoff>\n")
         f.write("<keylock>" + repr(keylock) + "</keylock>\n")
         f.write("<runmode>" + repr(runmode) + "</runmode>\n")
-        f.write("<holidayhours>" + repr(holidayhours) + "</holidayhours>\n") 
+        f.write("<holidayhours>" + repr(holidayhours) + "</holidayhours>\n")
         f.write("<tempholdmins>" + repr(tempholdmins) + "</tempholdmins>\n")
         f.write("<remtemp>" + repr(remoteairtemp[loop]) + "</remtemp>\n")
         f.write("<floortemp>" + repr(floortemp[loop]) + "</floortemp>\n")
@@ -484,13 +476,13 @@ for controller in StatList:
         f.write("<wday_t4_temp>" + repr(wday_t4_temp) + "</wday_t4_temp>\n")
         f.write("<wend_t1_hour>" + repr(wend_t1_hour) + "</wend_t1_hour>\n")
         f.write("<wend_t1_mins>" + repr(wend_t1_mins) + "</wend_t1_mins>\n")
-        f.write("<wend_t1_temp>" + repr(wend_t1_temp) + "</wend_t1_temp>\n") 
+        f.write("<wend_t1_temp>" + repr(wend_t1_temp) + "</wend_t1_temp>\n")
         f.write("<wend_t2_hour>" + repr(wend_t2_hour) + "</wend_t2_hour>\n")
         f.write("<wend_t2_mins>" + repr(wend_t2_mins) + "</wend_t2_mins>\n")
         f.write("<wend_t2_temp>" + repr(wend_t2_temp) + "</wend_t2_temp>\n")
         f.write("<wend_t3_hour>" + repr(wend_t3_hour) + "</wend_t3_hour>\n")
         f.write("<wend_t3_mins>" + repr(wend_t3_mins) + "</wend_t3_mins>\n")
-        f.write("<wend_t3_temp>" + repr(wend_t3_temp) + "</wend_t3_temp>\n") 
+        f.write("<wend_t3_temp>" + repr(wend_t3_temp) + "</wend_t3_temp>\n")
         f.write("<wend_t4_hour>" + repr(wend_t4_hour) + "</wend_t4_hour>\n")
         f.write("<wend_t4_mins>" + repr(wend_t4_mins) + "</wend_t4_mins>\n")
         f.write("<wend_t4_temp>" + repr(wend_t4_temp) + "</wend_t4_temp>\n")
@@ -503,11 +495,9 @@ for controller in StatList:
 
 # Cycle round controllers complete
 f.write('</poll>\n')
-# Print summary
+f.close()
 
 fcsv = open(fcsvfile, 'a')
-
-
 s= localtime + ','
 fcsv.write(s)
 
@@ -525,7 +515,6 @@ for loop in range(1, 13):
 fcsv.write('x\n')
 fcsv.close()
 
-f.close()
 
 cmd_update =  "rrdtool update %s N:0" % (rrdfile)
 for controller in StatList:
@@ -593,10 +582,10 @@ for controller in StatList:
             zoneload += 1
             zone_area = 0
             for circuit in controller[SL_CIRCUITS]:
-                circuit_area = 0            
+                circuit_area = 0
                 circuitload += 1
                 print "Circuit %d %s" % (circuit, CircuitList[circuit-1][CL_SHRT_NAME])
-    # Would be best to lookup rather than index here   
+    # Would be best to lookup rather than index here
                 for rectangle in CircuitList[circuit-1][CL_RECTANGLES]:
                     print rectangle
                     rect_area = rectangle[0]*rectangle[1]
@@ -606,7 +595,7 @@ for controller in StatList:
                 print "circuit area %f" % circuit_area
             print "zone area %f" % zone_area
             areaload += zone_area
-        
+
 
 cmd_update += ":%s" % (zoneload)
 cmd_update += ":%s" % (circuitload)
