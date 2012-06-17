@@ -1,0 +1,38 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+Add your content here.
+
+
+= Details =
+
+|| *Icon* || *Configuration* ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/sensor_mode_int.png || Internal Air Sensor ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/sensor_mode_rem.png || Remote Air Sensor ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/sensor_mode_int_floor.png || Internal Air Sensor + Floor Monitor ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/sensor_mode_rem_floor.png || Remnote Air Sensor + Floor Monitor ||
+
+
+|| *Icon* || *Graph Duration* ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/graph_24.png || 24 Hours ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/graph_7.png || 7 Days ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/graph_4.png || 4 Weeks ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/graph_8.png || 8 Weeks ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/graph_12.png || 12 Weeks ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/graph_52.png || 52 Weeks ||
+
+
+|| *Icon* || *Graph Duration* ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/clock.png || Hold ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/flame.png || 7 On ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/frost.png || 4 Frost ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/holiday.png || Holiday Mode ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/limit.png || Floor limiting ||
+|| http://heatmiser-monitor-control.googlecode.com/svn/trunk/images/locked.png || Keypad Locked ||
+
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
