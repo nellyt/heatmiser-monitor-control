@@ -87,7 +87,7 @@ You should now have time synchronised controllers, polled every 10 minutes.
 Web pages will give access to several status pages and links to graphs.
 
 Rarely used features can be access by simple hacks to files such as
- *hm_lock.py
- *hm_set_holiday.py
+ * <pre>hm_lock.py</pre>
+ * <pre>hm_set_holiday.py</pre>
 ==Backup==
 You may want to periodically back up the rrd's
