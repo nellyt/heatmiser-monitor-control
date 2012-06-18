@@ -172,7 +172,8 @@
         <a href="heating_status_ss.htm">Status</a> :
         <a href="heating_config_ss.htm">Config</a> :
         <a href="heating_times_ss.htm">Times</a> :
-        <a href="mytimeline.htm">Timeline</a>
+        <a href="mytimeline.htm">Timeline</a> : 
+        <a href="graphs">Graphs</a>
         <br/>
         </body>
         </html>
