@@ -191,7 +191,8 @@
                         <xsl:otherwise>
                             <xsl:variable name="holdmins"><xsl:value-of select="./t:tempholdmins" /> mins</xsl:variable>
                             <img src="images/clock.png" alt="{$holdmins}" height="24" width="24"></img>
-                            <xsl:value-of select="floor(./t:tempholdmins div 60)" />:<xsl:value-of select="./t:tempholdmins mod 60" />
+                            <xsl:variable name="holdminsmod60"><xsl:value-of select="./t:tempholdmins  mod 60" /></xsl:variable>
+                            (<xsl:value-of select="floor(./t:tempholdmins div 60)" />:<xsl:value-of select='format-number($holdminsmod60, "00")' />)
                         </xsl:otherwise>
                     </xsl:choose>
                 </td>
@@ -274,9 +275,9 @@
                     <xsl:choose>
                         <!-- TODO: Not sure if these are correct error codes -->
                         <xsl:when test="./t:errcode = 0">OK</xsl:when>
-                        <xsl:when test="./t:errcode = 224">IntAir</xsl:when>
-                        <xsl:when test="./t:errcode = 225">Floor</xsl:when>
-                        <xsl:when test="./t:errcode = 225">RemAir</xsl:when>
+                        <xsl:when test="./t:errcode = 224"><img src="images/maintenance.png" alt="IntAir" height="48" width="48"></img>IntAir</xsl:when>
+                        <xsl:when test="./t:errcode = 225"><img src="images/maintenance.png" alt="Floor" height="48" width="48"></img>Floor</xsl:when>
+                        <xsl:when test="./t:errcode = 225"><img src="images/maintenance.png" alt="RemAir" height="48" width="48"></img>RemAir</xsl:when>
                         <xsl:otherwise>UNKNWON</xsl:otherwise>
                     </xsl:choose>                     
                 </td>
@@ -313,7 +314,8 @@
         <a href="heating_status_ss.htm">Status</a> :
         <a href="heating_config_ss.htm">Config</a> :
         <a href="heating_times_ss.htm">Times</a> :
-        <a href="mytimeline.htm">Timeline</a>
+        <a href="mytimeline.htm">Timeline</a> : 
+        <a href="graphs">Graphs</a>
         <br/>
         </body>
         </html>
