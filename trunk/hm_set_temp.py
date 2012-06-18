@@ -14,6 +14,7 @@ import os
 from stats_defn import *
 from hm_constants import *
 from hm_utils import *
+from comms_settings import *
 
 # CODE STARTS HERE
 
@@ -30,12 +31,12 @@ localtime = time.strftime("%d %b %Y %H:%M:%S +0000", polltimet)
 localday  = time.strftime("%w", polltimet)
 
 serport = serial.Serial()
-serport.port     = 6 # 1 less than com port, USB is 6=com7, ether is 9=10
-serport.baudrate = 4800
-serport.bytesize = serial.EIGHTBITS
-serport.parity   = serial.PARITY_NONE
-serport.stopbits = serial.STOPBITS_ONE
-serport.timeout  = 3
+serport.port = COM_PORT
+serport.baudrate = COM_BAUD
+serport.bytesize = COM_SIZE
+serport.parity = COM_PARITY
+serport.stopbits = COM_STOP
+serport.timeout = COM_TIMEOUT
 try:
     serport.open()
 except serial.SerialException, e:

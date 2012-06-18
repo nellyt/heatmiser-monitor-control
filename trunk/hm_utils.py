@@ -358,6 +358,7 @@ def hmSetTemp(destination, temp, serport) :
     
 def hmHoldTemp(destination, temp, minutes, serport) :
     """bla bla"""
+    # @todo reject if number too big
     hmSetTemp(destination, temp, serport)
     time.sleep(2) # sleep for 2 seconds before next controller
     protocol = HMV3_ID # TODO should look this up in statlist
