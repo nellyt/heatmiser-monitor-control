@@ -131,8 +131,10 @@
                     </xsl:choose>
                     <xsl:if test="./t:tempholdmins > 0">
                         &#160;
-                        <img src="images/clock.png" alt="TempHold" height="24" width="24"></img>
-                        <small>(<xsl:value-of select="floor(./t:tempholdmins div 60)" />:<xsl:value-of select="./t:tempholdmins mod 60" />)</small>
+                        <xsl:variable name="holdmins"><xsl:value-of select="./t:tempholdmins" /> mins</xsl:variable>
+                        <img src="images/clock.png" alt="{$holdmins}" height="24" width="24"></img>
+                        <xsl:variable name="holdminsmod60"><xsl:value-of select="./t:tempholdmins  mod 60" /></xsl:variable>
+                        <small>(<xsl:value-of select="floor(./t:tempholdmins div 60)" />:<xsl:value-of select='format-number($holdminsmod60, "00")' />)</small>
                     </xsl:if>
                 </td>
                 <td title="thisdemand">
@@ -158,8 +160,17 @@
                     </xsl:choose>
                     <xsl:choose>
                         <xsl:when test="./t:tempholdmins = 0">-</xsl:when>
-                        <xsl:otherwise><img src="images/clock.png" alt="TempHold" height="24" width="24"></img></xsl:otherwise>
+                        <xsl:otherwise><xsl:variable name="holdmins"><xsl:value-of select="./t:tempholdmins" /> mins</xsl:variable>
+                        <img src="images/clock.png" alt="{$holdmins}" height="24" width="24"></img></xsl:otherwise>
                     </xsl:choose>
+                    <xsl:choose>
+                        <!-- TODO: Not sure if these are correct error codes -->
+                        <xsl:when test="./t:errcode = 0">-</xsl:when>
+                        <xsl:when test="./t:errcode = 224"><img src="images/maintenance.png" alt="IntAir" height="48" width="48"></img></xsl:when>
+                        <xsl:when test="./t:errcode = 225"><img src="images/maintenance.png" alt="Floor" height="48" width="48"></img></xsl:when>
+                        <xsl:when test="./t:errcode = 225"><img src="images/maintenance.png" alt="RemAir" height="48" width="48"></img></xsl:when>
+                        <xsl:otherwise>UNKNWON</xsl:otherwise>
+                    </xsl:choose>                    
                 </td>
             </tr>
                         
