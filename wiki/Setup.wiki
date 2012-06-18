@@ -1,0 +1,33 @@
+#summary Setup Instructions
+
+= Introduction =
+
+Add your content here.
+
+
+== Source ==
+
+
+==Download source code==
+
+==Python==
+Download python2.7
+Download pyserial http://pyserial.sourceforge.net/
+
+==RRDTOOL==
+
+=Configuration=
+
+==Email==
+Currently only support Gmail
+Put you login and password and where the email is the be sent in email_settings.py
+
+==Controllers==
+Each controller on your network needs a unique address. This must be done manually at each controller.
+
+Edit stats_defn.py to contain a list of you controllers
+ StatList = [
+ [1,  "Study", "Study",    HMV3_ID, "A020F0", [19,20]],
+ ]
+
+==RS485==
