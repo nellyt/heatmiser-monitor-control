@@ -56,14 +56,18 @@ for graph in graphs:
 			' VDEF:' + ds_name  + 'last=' + ds_name  + ',LAST' + \
 			' VDEF:' + ds_name2 + 'last=' + ds_name2 + ',LAST' + \
 			' VDEF:' + ds_name3 + 'last=' + ds_name3 + ',LAST' + \
+			' CDEF:heat=' + ds_name4 + ',.5,+,FLOOR,'+ds_name+',UNKN,IF' + \
 			' COMMENT:"Generated ' + cur_date + '\\n"' + \
-			' AREA:' + ds_name + '#FFFF00' + ':"Air"'\
+			' AREA:' + ds_name + '#FFF880' \
+			' AREA:heat'  + '#FFD0A0' \
+			' LINE1:heat'  + '#EDB200' + ':"Heating"'\
+			' LINE1:' + ds_name + '#FFD000' + ':"Air"'\
 			' GPRINT:' + ds_name  + 'last:"Current Air   = %6.2lf%S"' + \
 			' LINE:' + ds_name2 + '#FF0000' + ':"Floor"'\
 			' GPRINT:' + ds_name2 + 'last:"Current Floor = %6.2lf%S"' + \
 			' LINE:' + ds_name3 + '#008000' + ':"Set"'\
 			' GPRINT:' + ds_name3 + 'last:"Current Set   = %6.2lf%S"' + \
-			' LINE:' + ds_name4 + '#000000' + \
+			' LINE:' + ds_name4 + '#FC4242' + \
 			' --title="Room ' + controller[2] + ' ' + graph[0] + '"' + \
 			' --vertical-label="Celcius"' + \
 			' --start=' + start_time + \
