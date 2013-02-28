@@ -152,12 +152,14 @@ fcsvfile = 'heatmiser_status.csv'
 statusfile = 'heatmiser_status.xml'
 
 if startofday == 1:
+if (os.path.exists(rrdrocfile)):
     print "Backing up files"
     shutil.copy2(rrdfile,bufullname)
     buname = time.strftime("hmoptimstart%Y%m%d.rrd", polltimet)
     bufullname = os.path.join(dbup,buname)
     shutil.copy2(rrdrocfile,bufullname)
 
+if (os.path.exists(fcsvfile)):
     print "Backing up files"
     buname = time.strftime("heatmiser_status%Y%m%d.csv", polltimet)
     bufullname = os.path.join(dbup,buname)
@@ -166,6 +168,7 @@ if startofday == 1:
     print fcsvfile
     shutil.copy2(fcsvfile,bufullname)
 
+if (os.path.exists(statusfile)):
     print "Backing up files"
     buname = time.strftime("heatmiser_status%Y%m%d.xml", polltimet)
     bufullname = os.path.join(dbup,buname)
@@ -201,6 +204,7 @@ print "No of controllers is %d" % (number_of_controllers)
 # How initialise good and bad to zero?
 #good = 0
 #bad = 0
+# @todo Remove good and bad
 good = [0,0,0,0,0,0,0,0,0,0,0,0,0] #one bigger than size required
 bad =  [0,0,0,0,0,0,0,0,0,0,0,0,0]
 remoteairtemp = range(number_of_controllers+1)
@@ -237,8 +241,8 @@ f.write("</polltime>\n")
 # CYCLE THROUGH ALL CONTROLLERS
 for controller in StatList:
     loop = controller[SL_ADDR] #BUG assumes statlist is addresses are 1...n, with no gaps or random
-    print loop
     print
+    print loop
     print "Testing control ID %2d in %s *****************************" % (loop, controller[SL_LONG_NAME])
     badresponse[loop] = 0
     unhealthy[loop] = 0
@@ -271,29 +275,25 @@ for controller in StatList:
         s= "%s : Write timeout error: %s\n" % (localtime, e)
         sys.stderr.write(s)
         badresponse[loop] += 1
+        errortext = "COM Port Error"
 
     # Now wait for reply
     byteread = serport.read(100)	# NB max return is 75 in 5/2 mode or 159 in 7day mode, this does not yet supt 7 day
     #print "Bytes read %d" % (len(byteread) )
-    #TODO checking for length here can be removed
-    if (len(byteread)) == 75:
-        print  "Correct length reply received"
-        good[loop] += 1
+    #TODO checking for correct length here can be removed
+    # TODO But we should check for no response
+    if (len(byteread)) == 0:
+        print  "No reply received"
+        badresponse[loop] += 1
+        errortext = "No Response"
     else:
-        print "Incorrect length reply %s" % (len(byteread))
-        bad[loop] += 1
-        s= "%s : Controller %2d : Incorrect length reply : %s\n" % (localtime, loop, len(byteread))
-        sys.stderr.write(s)
-        badresponse[loop] += 1
-
-    # TODO All this should only happen if correct length reply
-    #Now try converting it back to array
-    datal = []
-    datal = datal + (map(ord,byteread))
-
-
-    if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, controller[SL_CONTR_TYPE], destination, FUNC_READ, 75, datal) == False):
-        badresponse[loop] += 1
+        # TODO All this should only happen if correct length reply
+        #Now try converting it back to array
+        datal = []
+        datal = datal + (map(ord,byteread))
+        if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, controller[SL_CONTR_TYPE], destination, FUNC_READ, 75, datal) == False):
+            badresponse[loop] += 1
+            errortext = "Msg check fail"
 
     if (badresponse[loop]== 0):
         # Should really only be length 75 or TBD at this point as we shouldnt do this if bad resp
@@ -426,8 +426,9 @@ for controller in StatList:
     print "Controller %2d Good %d Bad %d" % (loop, good[loop], bad[loop])
     if (badresponse[loop]== 0):
         f.write('<controller>\n')
-        f.write("<locationlong>" + controller[2] + "</locationlong>\n")
-        f.write("<locationshort>" + controller[1] + "</locationshort>\n")
+        f.write("<locationlong>" + controller[SL_LONG_NAME] + "</locationlong>\n")
+        f.write("<locationshort>" + controller[SL_SHRT_NAME] + "</locationshort>\n")
+        f.write("<health>GOOD</health>\n")
         f.write("<ident>" + repr(address) + "</ident>\n")
         f.write("<vendor>" + repr(vendor) + "</vendor>\n")
         f.write("<version>" + repr(version) + "</version>\n")
@@ -489,7 +490,13 @@ for controller in StatList:
         f.write("<wend_t4_mins>" + repr(wend_t4_mins) + "</wend_t4_mins>\n")
         f.write("<wend_t4_temp>" + repr(wend_t4_temp) + "</wend_t4_temp>\n")
         f.write("</controller>\n")
-
+    else:
+        f.write('<controller>\n')
+        f.write("<locationlong>" + controller[SL_LONG_NAME] + "</locationlong>\n")
+        f.write("<locationshort>" + controller[SL_SHRT_NAME] + "</locationshort>\n")
+        f.write("<health reason=\"" + errortext + "\">BAD</health>\n")
+        f.write("</controller>\n")
+        
     problem += badresponse[loop]
     loop = loop+1 # Change to for loop TODO not used
 
@@ -519,16 +526,16 @@ fcsv.close()
 
 cmd_update =  "rrdtool update %s N:0" % (rrdfile)
 for controller in StatList:
-    if (badresponse[controller[0]] > 1) :
-        cmd_update += ":U:U:U:U"
-    else:
+    if (badresponse[controller[0]] ==0) :
         if (sensormode[controller[0]] == 3):
             cmd_update += ":%s" % (intairtemp[controller[0]])
         else:
             cmd_update += ":%s" % (remoteairtemp[controller[0]])
         cmd_update += ":%s" % (floortemp[controller[0]])
         cmd_update += ":%s" % (settemp[controller[0]])
-        cmd_update += ":%s" % (demand[controller[0]])
+        cmd_update += ":%s" % (demand[controller[0]])    
+    else:
+        cmd_update += ":U:U:U:U"
 
 print cmd_update
 cmd = os.popen4(cmd_update)
@@ -540,11 +547,11 @@ if len(cmd_output) > 0:
 #Update the rate of change
 cmd_update =  "rrdtool update %s N" % (rrdrocfile)
 for controller in StatList:
-    if (badresponse[controller[0]] > 1) :
-        cmd_update += ":U:U"
-    else:
+    if (badresponse[controller[0]] == 0) :
         cmd_update += ":%s" % (rateofchange[controller[0]])
         cmd_update += ":%s" % (optimstart[controller[0]])
+    else:
+        cmd_update += ":U:U"
 
 print cmd_update
 cmd = os.popen4(cmd_update)
@@ -556,10 +563,10 @@ if len(cmd_output) > 0:
 #Update the time error
 cmd_update =  "rrdtool update %s N" % (rrdtimeerrfile)
 for controller in StatList:
-    if (badresponse[controller[0]] > 1) :
-        cmd_update += ":U"
-    else:
+    if (badresponse[controller[0]] == 0) :
         cmd_update += ":%s" % (timeerr[controller[0]])
+    else:
+        cmd_update += ":U"
 
 print cmd_update
 cmd = os.popen4(cmd_update)
@@ -576,9 +583,7 @@ areaload = 0
 ohdearerror = 0
 for controller in StatList:
     print "controller %d" % controller[0]
-    if (badresponse[controller[0]] > 1) :
-        ohdearerror = 1
-    else:
+    if (badresponse[controller[0]] == 0) :
         if (demand[controller[0]] == 1) :
             zoneload += 1
             zone_area = 0
@@ -596,11 +601,15 @@ for controller in StatList:
                 print "circuit area %f" % circuit_area
             print "zone area %f" % zone_area
             areaload += zone_area
+    else:
+        ohdearerror = 1
 
-
-cmd_update += ":%s" % (zoneload)
-cmd_update += ":%s" % (circuitload)
-cmd_update += ":%s" % (areaload)
+if (ohdearerror == 0) :
+    cmd_update += ":%s" % (zoneload)
+    cmd_update += ":%s" % (circuitload)
+    cmd_update += ":%s" % (areaload)
+else :
+    cmd_update += ":U:U:U"
 
 print cmd_update
 cmd = os.popen4(cmd_update)
