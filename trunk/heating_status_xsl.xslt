@@ -141,27 +141,33 @@
                     <xsl:choose>
                         <xsl:when test="./t:thisdemand = 0">-</xsl:when>
                         <xsl:when test="./t:thisdemand = 1"><img src="images/flame.png" alt="Heating" height="25" width="18"></img></xsl:when>
-                        <xsl:otherwise>UNKNWON</xsl:otherwise>
+                        <xsl:otherwise>U</xsl:otherwise>
                     </xsl:choose>
                     <xsl:choose>
                         <xsl:when test="./t:keylock = 0">-</xsl:when>
                         <xsl:when test="./t:keylock = 1"><img src="images/locked.png" alt="Locked" height="24" width="24"></img></xsl:when>
-                        <xsl:otherwise>UNKNWON</xsl:otherwise>
+                        <xsl:otherwise>U</xsl:otherwise>
                     </xsl:choose>
                     <xsl:choose>
                         <xsl:when test="./t:runmode = 0">-</xsl:when>
                         <xsl:when test="./t:runmode = 1"><img src="images/frost.png" alt="Frost" height="32" width="32"></img></xsl:when>
-                        <xsl:otherwise>UNKNWON</xsl:otherwise>
+                        <xsl:otherwise>U</xsl:otherwise>
                     </xsl:choose>
                     <xsl:choose>
                         <xsl:when test="./t:floorlimiting = 0">-</xsl:when>
                         <xsl:when test="./t:floorlimiting = 1"><img src="images/limit.png" alt="FloorLimiting" height="24" width="24"></img></xsl:when>
-                        <xsl:otherwise>UNKNWON</xsl:otherwise>
+                        <xsl:otherwise>U</xsl:otherwise>
                     </xsl:choose>
                     <xsl:choose>
                         <xsl:when test="./t:tempholdmins = 0">-</xsl:when>
-                        <xsl:otherwise><xsl:variable name="holdmins"><xsl:value-of select="./t:tempholdmins" /> mins</xsl:variable>
-                        <img src="images/clock.png" alt="{$holdmins}" height="24" width="24"></img></xsl:otherwise>
+                        <xsl:when test="./t:tempholdmins > 0"><xsl:variable name="holdmins"><xsl:value-of select="./t:tempholdmins" /> mins</xsl:variable>
+                        <img src="images/clock.png" alt="{$holdmins}" height="24" width="24"></img></xsl:when>
+                        <xsl:otherwise>U</xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="./t:holidayhours = 0">-</xsl:when>
+                        <xsl:when test="./t:holidayhours > 0"><img src="images/holiday.png" alt="Holiday" height="24" width="32"></img></xsl:when>
+                        <xsl:otherwise>U</xsl:otherwise>
                     </xsl:choose>
                     <xsl:choose>
                         <!-- TODO: Not sure if these are correct error codes -->
@@ -169,14 +175,14 @@
                         <xsl:when test="./t:errcode = 224"><img src="images/maintenance.png" alt="IntAir" height="48" width="48"></img></xsl:when>
                         <xsl:when test="./t:errcode = 225"><img src="images/maintenance.png" alt="Floor" height="48" width="48"></img></xsl:when>
                         <xsl:when test="./t:errcode = 225"><img src="images/maintenance.png" alt="RemAir" height="48" width="48"></img></xsl:when>
-                        <xsl:otherwise>UNKNWON</xsl:otherwise>
+                        <xsl:otherwise>U</xsl:otherwise>
                     </xsl:choose>                    
                 </td>
             </tr>
                         
         </xsl:for-each>
         <tr>
-        <th>Ident</th>
+        <th>Location</th>
         <th>Graphs</th>
         <th>Air</th>
         <th>Remote</th>
