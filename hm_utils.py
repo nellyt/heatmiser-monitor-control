@@ -192,6 +192,21 @@ def hmVerifyMsgCRCOK(destination, protocol, source, expectedFunction, expectedLe
 
   else:
     assert 0, "Un-supported protocol found %s" % protocol
+	
+	
+def hmSendMsg(serport, message) :
+    # TODO avoid passing serport, make port an object?
+    try:
+        written = serport.write(message)  # Write a string
+    except serial.SerialTimeoutException, e:
+        s= "%s : Write timeout error: %s\n" % (localtime, e)
+        sys.stderr.write(s)
+    # Now wait for reply
+    byteread = serport.read(100)    # NB max return is 75 in 5/2 mode or 159 in 7day mode
+    datal = []
+    datal = datal + (map(ord,byteread))
+    return datal
+	
 
 def hmKeyLock_On(destination, serport) :
   hmKeyLock(destination, KEY_LOCK_LOCK, serport)
@@ -214,22 +229,12 @@ def hmKeyLock(destination, state, serport) :
     print msg
     string = ''.join(map(chr,msg))
 
-    #TODO Need a send msg method
-
-    try:
-        written = serport.write(string)  # Write a string
-    except serial.SerialTimeoutException, e:
-        s= "%s : Write timeout error: %s\n" % (localtime, e)
-        sys.stderr.write(s)
-    # Now wait for reply
-    byteread = serport.read(100)    # NB max return is 75 in 5/2 mode or 159 in 7day mode
-    datal = []
-    datal = datal + (map(ord,byteread))
+    datal = hmSendMsg(serport, string)
 
     if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, DONT_CARE_LENGTH, datal) == False):
         print "OH DEAR BAD RESPONSE"
     return 1
-
+	
 
 def hmSetHolEnd(destination, enddatetime, serport) :
     """bla bla"""
@@ -263,18 +268,7 @@ def hmSetHolHours(destination, hours, serport) :
     print msg
     string = ''.join(map(chr,msg))
 
-    #TODO Need a send msg method
-
-    try:
-        written = serport.write(string)  # Write a string
-    except serial.SerialTimeoutException, e:
-        # TODO local time not defined?
-        s= "%s : Write timeout error: %s\n" % (localtime, e)
-        sys.stderr.write(s)
-    # Now wait for reply
-    byteread = serport.read(100)    # NB max return is 75 in 5/2 mode or 159 in 7day mode
-    datal = []
-    datal = datal + (map(ord,byteread))
+    datal = hmSendMsg(serport, string)
 
     if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, DONT_CARE_LENGTH, datal) == False):
         print "OH DEAR BAD RESPONSE"
@@ -296,10 +290,7 @@ def hmUpdateTime(destination, serport) :
             secs = 60 # Need to do this as pyhton seconds can be  [0,61]
         print "%d %d:%d:%d" % (day, hour, mins, secs)
         payload = [day, hour, mins, secs]
-        #msg = hmFormMsgCRC(destination, controller[SL_CONTR_TYPE], MY_MASTER_ADDR, FUNC_WRITE, CUR_TIME_ADDR, payload)
         msg = hmFormMsgCRC(destination, protocol, MY_MASTER_ADDR, FUNC_WRITE, CUR_TIME_ADDR, payload)
-        # TODO should not be necessary to pass in protocol as we can look that up in statlist
-        #msg = hmFormMsgCRC(destination, protocol, MY_MASTER_ADDR, FUNC_WRITE, HOL_HOURS_LO_ADDR, payload)
     else:
         "Un-supported protocol found %s" % protocol
         assert 0, "Un-supported protocol found %s" % protocol
@@ -309,17 +300,7 @@ def hmUpdateTime(destination, serport) :
     # http://stackoverflow.com/questions/180606/how-do-i-convert-a-list-of-ascii-values-to-a-string-in-python
     string = ''.join(map(chr,msg))
 
-    #TODO Need a send msg method
-
-    try:
-        written = serport.write(string)  # Write a string
-    except serial.SerialTimeoutException, e:
-        s= "%s : Write timeout error: %s\n" % (localtime, e)
-        sys.stderr.write(s)
-    # Now wait for reply
-    byteread = serport.read(100)    # NB max return is 75 in 5/2 mode or 159 in 7day mode
-    datal = []
-    datal = datal + (map(ord,byteread))
+    datal = hmSendMsg(serport, string)
 
     if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, DONT_CARE_LENGTH, datal) == False):
         print "OH DEAR BAD RESPONSE"
@@ -340,17 +321,7 @@ def hmSetTemp(destination, temp, serport) :
     print msg
     string = ''.join(map(chr,msg))
 
-    #TODO Need a send msg method
-
-    try:
-        written = serport.write(string)  # Write a string
-    except serial.SerialTimeoutException, e:
-        s= "%s : Write timeout error: %s\n" % (localtime, e)
-        sys.stderr.write(s)
-    # Now wait for reply
-    byteread = serport.read(100)    # NB max return is 75 in 5/2 mode or 159 in 7day mode
-    datal = []
-    datal = datal + (map(ord,byteread))
+    datal = hmSendMsg(serport, string)
 
     if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, DONT_CARE_LENGTH, datal) == False):
         print "OH DEAR BAD RESPONSE"
@@ -377,17 +348,7 @@ def hmHoldTemp(destination, temp, minutes, serport) :
     print msg
     string = ''.join(map(chr,msg))
 
-    #TODO Need a send msg method
-
-    try:
-        written = serport.write(string)  # Write a string
-    except serial.SerialTimeoutException, e:
-        s= "%s : Write timeout error: %s\n" % (localtime, e)
-        sys.stderr.write(s)
-    # Now wait for reply
-    byteread = serport.read(100)    # NB max return is 75 in 5/2 mode or 159 in 7day mode
-    datal = []
-    datal = datal + (map(ord,byteread))
+    datal = hmSendMsg(serport, string)
 
     if (hmVerifyMsgCRCOK(MY_MASTER_ADDR, protocol, destination, FUNC_WRITE, DONT_CARE_LENGTH, datal) == False):
         print "OH DEAR BAD RESPONSE"
