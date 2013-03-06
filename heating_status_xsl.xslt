@@ -144,8 +144,8 @@
                         <xsl:otherwise>U</xsl:otherwise>
                     </xsl:choose>
                     <xsl:choose>
-                        <xsl:when test="./t:keylock = 0">-</xsl:when>
-                        <xsl:when test="./t:keylock = 1"><img src="images/locked.png" alt="Locked" height="24" width="24"></img></xsl:when>
+                        <xsl:when test="./t:keylock = 0"><img src="images/unlocked.png" alt="UnLocked" height="24" width="32"></img></xsl:when>
+                        <xsl:when test="./t:keylock = 1"><img src="images/locked.png" alt="Locked" height="24" width="32"></img></xsl:when>
                         <xsl:otherwise>U</xsl:otherwise>
                     </xsl:choose>
                     <xsl:choose>
